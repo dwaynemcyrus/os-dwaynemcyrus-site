@@ -1,0 +1,68 @@
+.authPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+}
+
+.authPanel__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.authPanel__eyebrow {
+  color: var(--color-muted);
+}
+
+.authPanel__message {
+  line-height: 1.5;
+}
+
+.authPanel__hint {
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.authPanel__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.authPanel__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.authPanel__input {
+  min-height: 2.75rem;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-foreground);
+}
+
+.authPanel__input:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.authPanel__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.authPanel__error {
+  color: var(--color-foreground);
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .authPanel__actions {
+    grid-template-columns: 1fr;
+  }
+}

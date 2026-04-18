@@ -1,0 +1,7 @@
+.floatingActionBar {
+  position: fixed;
+  left: 50%;
+  bottom: var(--fab-bottom-offset);
+  z-index: 2;
+  transform: translateX(-50%);
+}

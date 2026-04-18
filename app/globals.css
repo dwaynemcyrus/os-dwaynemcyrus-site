@@ -1,0 +1,49 @@
+:root {
+  color-scheme: dark;
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-muted: #8f8f8f;
+  --color-border: #1a1a1a;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --header-height: 4rem;
+  --fab-bottom-offset: calc(var(--space-5) + env(safe-area-inset-bottom));
+  --transition-fast: 120ms ease;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font-geist-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}

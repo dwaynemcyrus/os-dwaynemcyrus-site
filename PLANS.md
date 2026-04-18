@@ -4,11 +4,40 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Active
 
-- None currently.
+### Phase 5 PWA hardening
+- Status: planned on 2026-04-18
+- Goal: add the installable PWA surface, offline app-shell loading, and service-worker-based caching without letting the service worker own item data or sync logic.
+- Files:
+  - `app/*`
+  - `components/*` if install/status UI is needed
+  - `public/*`
+  - `next.config.ts` if manifest/service-worker headers are needed
+  - `lib/*` if client-only service-worker registration or install status hooks are needed
+  - `CHANGELOG.md`
+  - `PLANS.md`
+  - `MEMORY.md`
+- Steps:
+  1. Add app manifest metadata and install assets
+  2. Add a narrow service worker for app-shell/offline caching only
+  3. Register the service worker from the client without moving data logic into it
+  4. Add minimal offline/install-state handling in the UI if needed
+  5. Run `npm run build` and `npm run lint`
+- Risks:
+  - PWA install on iPhone Safari depends on manifest/icon correctness and standalone behavior
+  - an overreaching service worker can interfere with auth or sync if it caches the wrong requests
+  - missing install assets will degrade installability even if the shell otherwise works
+- Verification:
+  - confirm `npm run build` and `npm run lint` pass
+  - confirm offline app shell loads after initial visit
+  - confirm capture still works offline through IndexedDB
+  - confirm service worker does not intercept or own item sync logic
+- Next action:
+  - finalize the native PWA approach and install asset direction before implementation
 
 ## Backlog
 
-- [ ] Add app scaffold and package tooling before enabling automated verification commands.
+- [ ] Phase 5: add PWA manifest, service worker, and offline shell hardening.
+- [ ] Add password reset flow after the main auth path is verified.
 
 ## Completed
 
@@ -31,3 +60,19 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-18 — Public explainer for the agent setup
 - Status: completed
 - Summary: added a public-facing explainer in `docs/codex-agent-project-template.md` describing how the agent setup works, what each file does, and how to reuse the structure as a template in other projects.
+
+### 2026-04-18 — Initial PSA build kickoff
+- Status: completed
+- Summary: scaffolded the Next.js App Router app with npm, TypeScript, and ESLint; added the Phase 1 static shell, shared text button primitive, `/` and `/list` route skeletons; and verified the build and lint scripts pass.
+
+### 2026-04-18 — Phase 2 local capture foundation
+- Status: completed
+- Summary: added the local-first capture flow with `idb` and Radix Dialog, wired the FAB-driven capture modal on both routes, persisted captured items to IndexedDB with temporary local ownership, rendered `/list` from local storage only, and verified `npm run build` plus `npm run lint`.
+
+### 2026-04-18 — Phase 3 deferred sync foundation
+- Status: completed
+- Summary: added real Supabase client wiring with env scaffolding, created the canonical `public.items` SQL migration under `supabase/migrations/`, added local-to-remote mapping plus a guarded sync engine and queue, derived route-level sync status from local state, and verified `npm run build` plus `npm run lint`.
+
+### 2026-04-18 — Phase 4 authenticated account flow
+- Status: completed
+- Summary: added the embedded home-screen email/password auth panel, added Supabase session hooks for sign up, sign in, and sign out with required email confirmation messaging, kept local capture available while signed out, preferred the authenticated user id for new captures, and verified `npm run build` plus `npm run lint`.

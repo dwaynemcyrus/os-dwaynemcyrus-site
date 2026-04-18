@@ -1,0 +1,14 @@
+.scrollRegion {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollRegion__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 100%;
+  padding: var(--space-5) var(--space-5) calc(var(--space-6) * 4);
+}

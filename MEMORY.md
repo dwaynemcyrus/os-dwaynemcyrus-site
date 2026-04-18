@@ -5,11 +5,29 @@ future sessions do not need to rediscover them.
 
 ## Environment
 
-- None currently.
+### Next.js root inference can drift when parent lockfiles exist
+- Status: active
+- First seen: 2026-04-18
+- Last seen: 2026-04-18
+- Symptom: `next build` warns that it inferred the workspace root from a lockfile outside the repo.
+- Root cause: Next.js detects multiple lockfiles and may choose a parent directory as the Turbopack root.
+- Resolution: set `turbopack.root` explicitly in `next.config.ts` to `process.cwd()`.
+- Prevention: keep the repo root pinned in config instead of relying on inferred workspace boundaries.
+- References:
+  - `next.config.ts`
 
 ## Tooling
 
-- None currently.
+### Initial hook loads should not call state-setting helpers directly from effects
+- Status: active
+- First seen: 2026-04-18
+- Last seen: 2026-04-18
+- Symptom: `eslint` fails with `react-hooks/set-state-in-effect` when an effect directly invokes a helper that synchronously sets state.
+- Root cause: the effect body calls a reusable load function whose control flow reaches `setState`, which React treats as a cascading render pattern.
+- Resolution: keep the initial async load inside the effect itself, await the external work there, and then update state after the async boundary with a cancellation guard when needed.
+- Prevention: for mount-time data loads, do not call reusable state-setting helpers directly from `useEffect`; keep the first-load path local to the effect.
+- References:
+  - `lib/hooks/useItems.ts`
 
 ## Build / CI
 
@@ -45,11 +63,32 @@ future sessions do not need to rediscover them.
 
 ## Data / Sync
 
-- None currently beyond the architecture memory above.
+### Deferred sync must no-op until Supabase auth exists
+- Status: active
+- First seen: 2026-04-18
+- Last seen: 2026-04-18
+- Symptom: pending items can never satisfy RLS if sync runs with a placeholder local user or without an authenticated Supabase session.
+- Root cause: the remote schema uses `auth.uid() = user_id`, while local capture starts with a temporary `local-user` owner before auth is implemented.
+- Resolution: wire the real Supabase client now, but exit the sync engine cleanly when env vars or an authenticated user are missing and leave items in `pending_sync`.
+- Prevention: do not treat missing auth as a sync error and do not push placeholder `userId` values to Supabase.
+- References:
+  - `lib/supabase/auth.ts`
+  - `lib/sync/syncEngine.ts`
+  - `supabase/migrations/20260418130000_create_items.sql`
 
 ## Deployment
 
-- None currently.
+### Supabase email confirmation depends on dashboard redirect settings
+- Status: active
+- First seen: 2026-04-18
+- Last seen: 2026-04-18
+- Symptom: signup appears to work, but the confirmation link returns to the wrong location or fails to establish the expected browser session.
+- Root cause: password signup with email confirmation depends on the project `Site URL` and allowed `Redirect URLs` matching the app origin.
+- Resolution: configure the Supabase Auth dashboard so the local dev origin and deployed origin are both valid redirect targets before testing confirmation emails.
+- Prevention: whenever the app origin changes, update Supabase Auth redirect settings alongside env configuration.
+- References:
+  - `.env.local`
+  - `lib/supabase/auth.ts`
 
 ## Known Constraints
 

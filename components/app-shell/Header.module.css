@@ -1,0 +1,27 @@
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  min-height: calc(var(--header-height) + env(safe-area-inset-top));
+  padding: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header__title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.header__side {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.header__side:last-child {
+  justify-content: flex-end;
+}
