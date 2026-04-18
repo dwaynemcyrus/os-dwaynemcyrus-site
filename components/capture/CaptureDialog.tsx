@@ -23,6 +23,9 @@ export function CaptureDialog({
           <Dialog.Title className={styles.captureDialog__title}>
             Capture
           </Dialog.Title>
+          <Dialog.Description className={styles.captureDialog__description}>
+            Capture a thought immediately. Local save happens before background sync.
+          </Dialog.Description>
           <CaptureForm
             onSubmitted={async () => {
               await onCaptured?.();

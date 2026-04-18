@@ -4,40 +4,12 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Active
 
-### Phase 5 PWA hardening
-- Status: planned on 2026-04-18
-- Goal: add the installable PWA surface, offline app-shell loading, and service-worker-based caching without letting the service worker own item data or sync logic.
-- Files:
-  - `app/*`
-  - `components/*` if install/status UI is needed
-  - `public/*`
-  - `next.config.ts` if manifest/service-worker headers are needed
-  - `lib/*` if client-only service-worker registration or install status hooks are needed
-  - `CHANGELOG.md`
-  - `PLANS.md`
-  - `MEMORY.md`
-- Steps:
-  1. Add app manifest metadata and install assets
-  2. Add a narrow service worker for app-shell/offline caching only
-  3. Register the service worker from the client without moving data logic into it
-  4. Add minimal offline/install-state handling in the UI if needed
-  5. Run `npm run build` and `npm run lint`
-- Risks:
-  - PWA install on iPhone Safari depends on manifest/icon correctness and standalone behavior
-  - an overreaching service worker can interfere with auth or sync if it caches the wrong requests
-  - missing install assets will degrade installability even if the shell otherwise works
-- Verification:
-  - confirm `npm run build` and `npm run lint` pass
-  - confirm offline app shell loads after initial visit
-  - confirm capture still works offline through IndexedDB
-  - confirm service worker does not intercept or own item sync logic
-- Next action:
-  - finalize the native PWA approach and install asset direction before implementation
+- None currently.
 
 ## Backlog
 
-- [ ] Phase 5: add PWA manifest, service worker, and offline shell hardening.
 - [ ] Add password reset flow after the main auth path is verified.
+- [ ] Manually validate standalone install and offline capture on iPhone Safari after the next push or deploy.
 
 ## Completed
 
@@ -76,3 +48,7 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-18 — Phase 4 authenticated account flow
 - Status: completed
 - Summary: added the embedded home-screen email/password auth panel, added Supabase session hooks for sign up, sign in, and sign out with required email confirmation messaging, kept local capture available while signed out, preferred the authenticated user id for new captures, and verified `npm run build` plus `npm run lint`.
+
+### 2026-04-18 — Phase 5 PWA hardening
+- Status: completed
+- Summary: added the installable manifest, generated minimal PSA icons, registered a native service worker, cached the offline app shell without moving data or sync logic into the service worker, and verified `npm run build`, `npm run lint`, plus local manifest and service-worker endpoint delivery.

@@ -29,6 +29,18 @@ future sessions do not need to rediscover them.
 - References:
   - `lib/hooks/useItems.ts`
 
+### Supabase CLI writes ephemeral project state under `supabase/.temp`
+- Status: active
+- First seen: 2026-04-18
+- Last seen: 2026-04-18
+- Symptom: `supabase db push` and related CLI commands can leave generated temp files that show up as noisy tracked changes.
+- Root cause: the Supabase CLI persists local project metadata in `supabase/.temp/`.
+- Resolution: ignore `supabase/.temp/` in `.gitignore` and keep only canonical migration files in version control.
+- Prevention: when reviewing Supabase changes, stage only `supabase/migrations/*` unless a real repo-managed config file is intentionally added.
+- References:
+  - `.gitignore`
+  - `supabase/migrations/20260418130000_create_items.sql`
+
 ## Build / CI
 
 - None currently.
