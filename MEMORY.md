@@ -118,11 +118,11 @@ future sessions do not need to rediscover them.
 ### Supabase email confirmation depends on dashboard redirect settings
 - Status: active
 - First seen: 2026-04-18
-- Last seen: 2026-04-18
+- Last seen: 2026-04-19
 - Symptom: signup appears to work, but the confirmation link returns to the wrong location or fails to establish the expected browser session.
 - Root cause: password signup with email confirmation depends on the project `Site URL` and allowed `Redirect URLs` matching the app origin.
-- Resolution: configure the Supabase Auth dashboard so the local dev origin and deployed origin are both valid redirect targets before testing confirmation emails.
-- Prevention: whenever the app origin changes, update Supabase Auth redirect settings alongside env configuration.
+- Resolution: configure the Supabase Auth dashboard so the local dev origin, deployed origin, and any explicit auth callback paths like `/settings/reset-password` are valid redirect targets before testing confirmation or recovery emails.
+- Prevention: whenever the app origin or auth-route path changes, update Supabase Auth redirect settings alongside env configuration.
 - References:
   - `.env.local`
   - `lib/supabase/auth.ts`

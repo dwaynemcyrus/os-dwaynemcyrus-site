@@ -6,9 +6,11 @@ All notable commit-ready changes to this project should be recorded here.
 
 ### Added
 - Signed-in JSON backup export from canonical Supabase rows with a direct browser download flow.
+- Password-recovery request flow from the home account surface plus `/settings` and `/settings/reset-password` routes for recovery navigation and reset completion.
 
 ### Changed
 - Promoted `docs/build-specs/build-spec-v2-export-backup.md` to the current build in the build-spec entrypoint.
+- Promoted `docs/build-specs/build-spec-v2-account-recovery.md` to the current build in the build-spec entrypoint.
 
 ## 1.0.0 - 2026-04-19
 

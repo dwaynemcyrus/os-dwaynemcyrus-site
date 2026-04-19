@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import {
   getCurrentSession,
+  requestPasswordResetForEmail,
   signInWithPassword,
   signOutCurrentUser,
   signUpWithPassword,
@@ -141,6 +142,43 @@ export function useAuthSession() {
     }
   }
 
+  async function requestPasswordReset(email: string) {
+    setState((currentState) => ({
+      ...currentState,
+      errorMessage: null,
+      infoMessage: null,
+      isSubmitting: true,
+    }));
+
+    try {
+      const emailRedirectTo =
+        typeof window === "undefined"
+          ? undefined
+          : `${window.location.origin}/settings/reset-password`;
+
+      if (!emailRedirectTo) {
+        throw new Error("Password recovery is only available in the browser.");
+      }
+
+      await requestPasswordResetForEmail(email, emailRedirectTo);
+
+      setState((currentState) => ({
+        ...currentState,
+        errorMessage: null,
+        infoMessage: "Check your email for a password-reset link.",
+        isSubmitting: false,
+      }));
+    } catch (error) {
+      setState((currentState) => ({
+        ...currentState,
+        errorMessage:
+          error instanceof Error ? error.message : "Password reset failed.",
+        infoMessage: null,
+        isSubmitting: false,
+      }));
+    }
+  }
+
   async function signOut() {
     setState((currentState) => ({
       ...currentState,
@@ -172,6 +210,7 @@ export function useAuthSession() {
     ...state,
     createAccount,
     hasSession: Boolean(state.session),
+    requestPasswordReset,
     signIn,
     signOut,
   };

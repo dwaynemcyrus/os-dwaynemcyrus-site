@@ -8,7 +8,7 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Backlog
 
-- [ ] Activate and implement `build-spec-v2-account-recovery.md` when password reset becomes the next milestone.
+- [ ] Manually validate the deployed password-reset email flow against `https://os.dwaynemcyrus.com/settings/reset-password`.
 
 ## Completed
 
@@ -63,3 +63,7 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-19 — V2 export/backup implementation
 - Status: completed
 - Summary: promoted `build-spec-v2-export-backup.md` to the current build, added a signed-in JSON backup export backed by canonical Supabase rows, exposed the action in the existing account panel, and verified `npm run build` plus `npm run lint`.
+
+### 2026-04-19 — V2 account-recovery implementation
+- Status: completed
+- Summary: promoted `build-spec-v2-account-recovery.md` to the current build, added a forgot-password request flow on `/`, added `/settings` and `/settings/reset-password`, completed reset handling through Supabase recovery state, and verified `npm run build` plus `npm run lint`.

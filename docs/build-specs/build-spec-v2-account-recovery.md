@@ -4,8 +4,6 @@
 
 Define the next recovery milestone after `build-spec-v1-capture.md`.
 
-This build is not current yet.
-
 It exists to add a proper account-recovery path for the existing password-based
 authentication model without expanding into broader account settings.
 
@@ -13,10 +11,10 @@ authentication model without expanding into broader account settings.
 
 ## Status
 
-- planned
-- not active
-- do not implement by default while `docs/agents/build-spec.md` still points to
-  `build-spec-v1-capture.md`
+- current
+- active
+- implementation should follow this file while
+  `docs/agents/build-spec.md` points here
 
 ---
 
@@ -82,8 +80,10 @@ The recovery model should assume:
 
 - Supabase Auth remains the source of truth for password recovery
 - the app must honor the project’s site URL and redirect URL configuration
-- the flow may involve one route or a compact embedded recovery surface, but it
-  must be decision-complete before implementation
+- the forgot-password request entry point lives in the home account surface
+- reset-link completion happens on `/settings/reset-password`
+- `/settings` may list the available settings routes, but broader account settings
+  remain out of scope
 
 ---
 
