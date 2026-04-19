@@ -8,9 +8,9 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Backlog
 
-- [ ] Add password reset flow after the main auth path is verified.
+- [ ] Activate and implement `build-spec-v2-export-backup.md` when backup/export becomes the next milestone.
+- [ ] Activate and implement `build-spec-v2-account-recovery.md` when password reset becomes the next milestone.
 - [ ] Manually validate standalone install and offline capture on iPhone Safari after the next push or deploy.
-- [ ] Decide whether to add Supabase Realtime for near-instant open-device propagation on top of the new pull-sync baseline.
 
 ## Completed
 
@@ -56,4 +56,8 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ### 2026-04-19 — Phase 6 multi-device sync completion
 - Status: completed
-- Summary: added remote pull-and-reconcile into IndexedDB with last-write-wins protection for newer unsynced local rows, triggered sync on launch, reconnect, foreground, and manual refresh, added a refresh control near sync status, and added a non-current future resilience build spec covering realtime sync and export/backup direction.
+- Summary: added remote pull-and-reconcile into IndexedDB with last-write-wins protection for newer unsynced local rows, triggered sync on launch, reconnect, foreground, and manual refresh, added a refresh control near sync status, and added a non-current future resilience build spec for the next roadmap step.
+
+### 2026-04-19 — Future build-spec split for export and recovery
+- Status: completed
+- Summary: replaced the future resilience umbrella with two separate non-current build specs for export/backup and password-based account recovery, and removed realtime awareness from the planned roadmap.

@@ -12,7 +12,7 @@ All notable commit-ready changes to this project should be recorded here.
 - Phase 3 deferred sync foundation with Supabase client wiring, repo-local SQL migrations, a guarded sync queue, and derived sync-status hooks.
 - Phase 4 email/password auth flow with an embedded home-screen auth panel, session-aware client hooks, sign in/sign out, and confirmation-required account creation messaging.
 - Phase 5 PWA hardening with manifest metadata, generated PSA install icons, native service-worker registration, and offline app-shell caching.
-- Phase 6 multi-device sync completion with remote pull reconciliation, foreground/manual refresh, and a future resilience build spec for realtime sync plus export/backup direction.
+- Phase 6 multi-device sync completion with remote pull reconciliation, foreground/manual refresh, and a future split build-spec direction for export/backup plus account recovery.
 
 ### Changed
 - Established `docs/agents/build-spec.md` as the stable entrypoint for the active build.
@@ -41,3 +41,4 @@ All notable commit-ready changes to this project should be recorded here.
 - Added repo workflow policy for maintaining `MEMORY.md`.
 - Aligned `AGENTS.md` and the build-spec entrypoint on precedence and read order.
 - Added a public explainer document describing the agent template and how to reuse it in other projects.
+- Replaced the future resilience umbrella spec with separate non-current build specs for export/backup and account recovery.

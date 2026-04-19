@@ -36,6 +36,11 @@ Rules:
 - Do not move build specs back into `docs/agents/`
 - Do not treat `docs/tmp/` as the long-term home for canonical build specs
 
+Planned future build specs currently include:
+
+- `docs/build-specs/build-spec-v2-export-backup.md`
+- `docs/build-specs/build-spec-v2-account-recovery.md`
+
 ---
 
 ## Current Supporting Documents
@@ -87,8 +92,8 @@ These remain active regardless of which build spec is current:
 
 As of this revision:
 
-- the repo is still documentation-first
-- no `package.json` exists yet
-- verification commands must be discovered after the app scaffold exists
+- the repo now contains the implemented v1 PSA application
+- project tooling is defined in `package.json`
+- verification commands should be discovered from the current scripts before work begins
 
 Do not invent scripts or tooling contracts that are not present in the repo.
