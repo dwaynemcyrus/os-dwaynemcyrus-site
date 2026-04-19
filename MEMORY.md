@@ -101,6 +101,18 @@ future sessions do not need to rediscover them.
   - `lib/sync/syncEngine.ts`
   - `supabase/migrations/20260418130000_create_items.sql`
 
+### Backup exports should use canonical Supabase rows, not device cache state
+- Status: active
+- First seen: 2026-04-19
+- Last seen: 2026-04-19
+- Symptom: export payloads can differ by device if they are built from local IndexedDB instead of the authenticated remote dataset.
+- Root cause: each device maintains its own local cache and reconciliation timing, while the backup contract is supposed to represent the user's canonical synced data.
+- Resolution: generate backup downloads from authenticated Supabase rows filtered by `user_id`, then map those rows into the exported JSON shape.
+- Prevention: treat local IndexedDB as a runtime cache for this feature, not as the source of truth for durable backup export.
+- References:
+  - `lib/export/exportBackup.ts`
+  - `docs/build-specs/build-spec-v2-export-backup.md`
+
 ## Deployment
 
 ### Supabase email confirmation depends on dashboard redirect settings

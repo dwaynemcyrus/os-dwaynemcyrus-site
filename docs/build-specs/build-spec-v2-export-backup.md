@@ -13,10 +13,10 @@ Supabase without expanding into import or restore work yet.
 
 ## Status
 
-- planned
-- not active
-- do not implement by default while `docs/agents/build-spec.md` still points to
-  `build-spec-v1-capture.md`
+- current
+- active
+- implementation should follow this file while
+  `docs/agents/build-spec.md` points here
 
 ---
 

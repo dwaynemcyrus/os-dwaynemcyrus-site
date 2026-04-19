@@ -4,6 +4,12 @@ All notable commit-ready changes to this project should be recorded here.
 
 ## Unreleased
 
+### Added
+- Signed-in JSON backup export from canonical Supabase rows with a direct browser download flow.
+
+### Changed
+- Promoted `docs/build-specs/build-spec-v2-export-backup.md` to the current build in the build-spec entrypoint.
+
 ## 1.0.0 - 2026-04-19
 
 ### Added

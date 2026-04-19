@@ -15,7 +15,7 @@ and defines how future build specs should be referenced as the project grows.
 
 ## Current Build
 
-Current build: `docs/build-specs/build-spec-v1-capture.md`
+Current build: `docs/build-specs/build-spec-v2-export-backup.md`
 
 This is the build spec to follow unless a newer build is explicitly marked as
 current in this file.
@@ -38,7 +38,6 @@ Rules:
 
 Planned future build specs currently include:
 
-- `docs/build-specs/build-spec-v2-export-backup.md`
 - `docs/build-specs/build-spec-v2-account-recovery.md`
 
 ---
@@ -47,6 +46,7 @@ Planned future build specs currently include:
 
 The active build currently depends on these supporting canonical documents:
 
+- `docs/build-specs/build-spec-v1-capture.md`
 - `docs/build-specs/supporting/component-tree-v1-capture.md`
 - `docs/build-specs/supporting/file-responsibility-map-v1-capture.md`
 
@@ -93,6 +93,7 @@ These remain active regardless of which build spec is current:
 As of this revision:
 
 - the repo now contains the implemented v1 PSA application
+- the active build has moved to the export/backup milestone
 - project tooling is defined in `package.json`
 - verification commands should be discovered from the current scripts before work begins
 

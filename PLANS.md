@@ -8,9 +8,7 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Backlog
 
-- [ ] Activate and implement `build-spec-v2-export-backup.md` when backup/export becomes the next milestone.
 - [ ] Activate and implement `build-spec-v2-account-recovery.md` when password reset becomes the next milestone.
-- [ ] Manually validate standalone install and offline capture on iPhone Safari after the next push or deploy.
 
 ## Completed
 
@@ -61,3 +59,7 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-19 — Future build-spec split for export and recovery
 - Status: completed
 - Summary: replaced the future resilience umbrella with two separate non-current build specs for export/backup and password-based account recovery, and removed realtime awareness from the planned roadmap.
+
+### 2026-04-19 — V2 export/backup implementation
+- Status: completed
+- Summary: promoted `build-spec-v2-export-backup.md` to the current build, added a signed-in JSON backup export backed by canonical Supabase rows, exposed the action in the existing account panel, and verified `npm run build` plus `npm run lint`.

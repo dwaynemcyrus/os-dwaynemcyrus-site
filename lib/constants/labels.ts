@@ -4,6 +4,8 @@ export const LABELS = {
   capture: "Capture",
   createAccount: "Create account",
   emptyState: "No captured items yet.",
+  exportBackup: "Export backup",
+  exportingBackup: "Exporting...",
   failed: "Failed",
   offline: "Offline",
   openList: "Open List",
