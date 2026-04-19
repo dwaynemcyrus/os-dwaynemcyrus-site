@@ -4,6 +4,8 @@ All notable commit-ready changes to this project should be recorded here.
 
 ## Unreleased
 
+## 1.0.0 - 2026-04-19
+
 ### Added
 - Initial documentation structure for build specs and agent guidance.
 - Initial Next.js App Router scaffold with TypeScript, ESLint, and npm tooling.
