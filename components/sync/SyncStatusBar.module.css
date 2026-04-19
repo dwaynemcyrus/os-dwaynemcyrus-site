@@ -1,4 +1,11 @@
 .syncStatusBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.syncStatusBar__label {
   color: var(--color-muted);
   font-size: 0.95rem;
   line-height: 1.4;

@@ -37,3 +37,24 @@ export function mapLocalItemToRemoteRecord(
     user_id: userId,
   };
 }
+
+export function mapRemoteRecordToLocalItem(record: RemoteItemRecord): LocalItem {
+  return {
+    content: record.content,
+    createdAt: record.created_at,
+    deviceCreatedAt: record.device_created_at,
+    deviceUpdatedAt: record.device_updated_at,
+    id: record.id,
+    isTrashed: record.is_trashed,
+    lastSyncedAt: record.last_synced_at,
+    needsRemoteCreate: false,
+    needsRemoteUpdate: false,
+    status: record.status,
+    syncErrorMessage: null,
+    syncState: "synced",
+    trashedAt: record.trashed_at,
+    type: record.type,
+    updatedAt: record.updated_at,
+    userId: record.user_id,
+  };
+}

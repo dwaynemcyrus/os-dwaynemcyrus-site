@@ -1,6 +1,11 @@
 import { ITEM_STORE_NAME, getDatabase } from "@/lib/db/indexedDb";
 import type { LocalItem, SyncState } from "@/lib/items/itemTypes";
 
+export async function getItemById(id: string) {
+  const database = await getDatabase();
+  return database.get(ITEM_STORE_NAME, id);
+}
+
 export async function getAllItems() {
   const database = await getDatabase();
   return database.getAll(ITEM_STORE_NAME);
@@ -18,6 +23,10 @@ export async function createItem(item: LocalItem) {
   const database = await getDatabase();
   await database.put(ITEM_STORE_NAME, item);
   return item;
+}
+
+export function saveItem(item: LocalItem) {
+  return createItem(item);
 }
 
 export async function updateItem(id: string, patch: Partial<LocalItem>) {

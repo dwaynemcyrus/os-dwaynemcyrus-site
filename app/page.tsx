@@ -7,12 +7,15 @@ import { OpenListButton } from "@/components/navigation/OpenListButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
+import { useAuthSession } from "@/lib/hooks/useAuthSession";
+import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
-import { useSyncStatus } from "@/lib/hooks/useSyncStatus";
 
 export default function Home() {
   const captureDialog = useCaptureDialog();
-  const { label } = useSyncStatus();
+  const { hasSession } = useAuthSession();
+  const { isSyncing, label } = useSyncStatus();
+  const refreshSync = useRefreshSync();
 
   useRetrySync();
 
@@ -28,7 +31,12 @@ export default function Home() {
       onFabPress={captureDialog.openDialog}
       title="Home"
     >
-      <SyncStatusBar label={label} />
+      <SyncStatusBar
+        label={label}
+        onRefresh={refreshSync}
+        refreshDisabled={isSyncing}
+        showRefresh={hasSession}
+      />
       <AuthPanel />
       <OpenListButton />
     </AppShell>

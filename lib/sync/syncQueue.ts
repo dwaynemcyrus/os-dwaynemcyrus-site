@@ -4,6 +4,8 @@ import { runSyncEngine, type SyncRunResult } from "@/lib/sync/syncEngine";
 export type SyncRunReason =
   | "app-load"
   | "capture"
+  | "foreground"
+  | "manual"
   | "reconnect"
   | "retry"
   | "trash";

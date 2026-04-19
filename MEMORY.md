@@ -75,6 +75,19 @@ future sessions do not need to rediscover them.
 
 ## Data / Sync
 
+### Push-only sync is not enough for multi-device visibility
+- Status: active
+- First seen: 2026-04-19
+- Last seen: 2026-04-19
+- Symptom: items created on one signed-in device appear in Supabase but never show up on other devices unless those devices also created them locally.
+- Root cause: local pending rows were pushed to Supabase, but there was no remote pull/reconcile path back into each device's IndexedDB.
+- Resolution: treat remote pull into IndexedDB as part of the baseline sync engine, not an optional extra, and trigger it on app load, reconnect, foreground, and manual refresh.
+- Prevention: do not call a sync model "multi-device" if it only pushes local state and never repopulates other devices' local stores.
+- References:
+  - `lib/sync/syncEngine.ts`
+  - `lib/items/itemMappers.ts`
+  - `lib/hooks/useRetrySync.ts`
+
 ### Deferred sync must no-op until Supabase auth exists
 - Status: active
 - First seen: 2026-04-18

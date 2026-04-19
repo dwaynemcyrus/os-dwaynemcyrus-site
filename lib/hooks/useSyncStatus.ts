@@ -9,7 +9,7 @@ import {
 } from "@/lib/items/itemQueries";
 import { getCurrentSession, subscribeToAuthStateChanges } from "@/lib/supabase/auth";
 import { isOnline, subscribeToNetworkChanges } from "@/lib/sync/networkState";
-import { getIsSyncing, subscribeToSyncQueue } from "@/lib/sync/syncQueue";
+import { getIsSyncing, runSyncQueue, subscribeToSyncQueue } from "@/lib/sync/syncQueue";
 
 type SyncStatusState = {
   failedCount: number;
@@ -98,4 +98,8 @@ export function useSyncStatus() {
   }, []);
 
   return state;
+}
+
+export function useRefreshSync() {
+  return () => runSyncQueue("manual");
 }

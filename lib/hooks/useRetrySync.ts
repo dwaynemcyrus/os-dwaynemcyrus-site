@@ -25,9 +25,20 @@ export function useRetrySync() {
       void runSyncQueue("app-load");
     });
 
+    function handleVisibilityChange() {
+      if (document.visibilityState !== "visible") {
+        return;
+      }
+
+      void runSyncQueue("foreground");
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       unsubscribe();
       unsubscribeAuth();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 }

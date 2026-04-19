@@ -8,16 +8,19 @@ import { ItemList } from "@/components/items/ItemList";
 import { BackButton } from "@/components/navigation/BackButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
+import { useAuthSession } from "@/lib/hooks/useAuthSession";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useItems } from "@/lib/hooks/useItems";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
-import { useSyncStatus } from "@/lib/hooks/useSyncStatus";
+import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { trashItem } from "@/lib/items/itemCommands";
 
 export default function ListPage() {
   const captureDialog = useCaptureDialog();
+  const { hasSession } = useAuthSession();
   const { isLoading, items, refreshItems } = useItems();
-  const { label } = useSyncStatus();
+  const { isSyncing, label } = useSyncStatus();
+  const refreshSync = useRefreshSync();
   const [, startTransition] = useTransition();
 
   useRetrySync();
@@ -36,7 +39,12 @@ export default function ListPage() {
       onFabPress={captureDialog.openDialog}
       title="Captured Items"
     >
-      <SyncStatusBar label={label} />
+      <SyncStatusBar
+        label={label}
+        onRefresh={refreshSync}
+        refreshDisabled={isSyncing}
+        showRefresh={hasSession}
+      />
       {isLoading ? null : items.length > 0 ? (
         <ItemList
           items={items}

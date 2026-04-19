@@ -7,6 +7,7 @@ export const LABELS = {
   failed: "Failed",
   offline: "Offline",
   openList: "Open List",
+  refreshSync: "Refresh sync",
   save: "Save",
   signIn: "Sign in",
   signInToSync: "Sign in to sync",

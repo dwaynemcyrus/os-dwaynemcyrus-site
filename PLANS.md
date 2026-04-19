@@ -10,6 +10,7 @@ This file tracks active and historical execution plans for non-trivial work.
 
 - [ ] Add password reset flow after the main auth path is verified.
 - [ ] Manually validate standalone install and offline capture on iPhone Safari after the next push or deploy.
+- [ ] Decide whether to add Supabase Realtime for near-instant open-device propagation on top of the new pull-sync baseline.
 
 ## Completed
 
@@ -52,3 +53,7 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-18 — Phase 5 PWA hardening
 - Status: completed
 - Summary: added the installable manifest, generated minimal PSA icons, registered a native service worker, cached the offline app shell without moving data or sync logic into the service worker, and verified `npm run build`, `npm run lint`, plus local manifest and service-worker endpoint delivery.
+
+### 2026-04-19 — Phase 6 multi-device sync completion
+- Status: completed
+- Summary: added remote pull-and-reconcile into IndexedDB with last-write-wins protection for newer unsynced local rows, triggered sync on launch, reconnect, foreground, and manual refresh, added a refresh control near sync status, and added a non-current future resilience build spec covering realtime sync and export/backup direction.
