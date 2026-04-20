@@ -9,6 +9,7 @@ This file tracks active and historical execution plans for non-trivial work.
 ## Backlog
 
 - [ ] Manually validate signed-in password change on the deployed `/settings` route.
+- [ ] Activate and implement `build-spec-v3-import-restore.md` when restore becomes the next milestone.
 
 ## Completed
 
@@ -71,3 +72,7 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-20 — Single-user auth cleanup
 - Status: completed
 - Summary: removed the email-based reset flow, deleted `/settings/reset-password`, replaced it with a signed-in password change form on `/settings`, documented locked-out recovery as a manual Supabase action, and verified `npm run build` plus `npm run lint`.
+
+### 2026-04-20 — Future import/restore build spec
+- Status: completed
+- Summary: added a non-current `build-spec-v3-import-restore.md` defining the next portability milestone around validated JSON import/restore and last-write-wins restoration by item id.

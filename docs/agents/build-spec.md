@@ -38,7 +38,7 @@ Rules:
 
 Planned future build specs currently include:
 
-- none currently
+- `docs/build-specs/build-spec-v3-import-restore.md`
 
 ---
 

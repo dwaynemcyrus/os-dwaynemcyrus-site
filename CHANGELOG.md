@@ -13,6 +13,9 @@ All notable commit-ready changes to this project should be recorded here.
 - Promoted `docs/build-specs/build-spec-v2-account-recovery.md` to the current build in the build-spec entrypoint.
 - Removed the incomplete email-based reset flow and re-scoped the current auth milestone around signed-in password change plus manual locked-out recovery.
 
+### Docs
+- Added a non-current `build-spec-v3-import-restore.md` to define the next planned restore milestone.
+
 ## 1.0.0 - 2026-04-19
 
 ### Added
