@@ -90,6 +90,9 @@ export function SettingsPanel() {
         </label>
       </div>
       <div className={styles.settingsPanel__list}>
+        <TextButton href="/trash" variant="secondary">
+          {LABELS.openTrash}
+        </TextButton>
         <TextButton
           disabled={isDisabled}
           onPress={() => {

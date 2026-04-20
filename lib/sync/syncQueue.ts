@@ -1,14 +1,9 @@
 import { isOnline } from "@/lib/sync/networkState";
-import { runSyncEngine, type SyncRunResult } from "@/lib/sync/syncEngine";
-
-export type SyncRunReason =
-  | "app-load"
-  | "capture"
-  | "foreground"
-  | "manual"
-  | "reconnect"
-  | "retry"
-  | "trash";
+import {
+  runSyncEngine,
+  type SyncRunReason,
+  type SyncRunResult,
+} from "@/lib/sync/syncEngine";
 
 type SyncListener = (isSyncing: boolean) => void;
 
@@ -37,8 +32,6 @@ export function subscribeToSyncQueue(listener: SyncListener) {
 }
 
 export function runSyncQueue(reason: SyncRunReason) {
-  void reason;
-
   if (activeRun) {
     return activeRun;
   }
@@ -52,7 +45,7 @@ export function runSyncQueue(reason: SyncRunReason) {
     });
   }
 
-  activeRun = runSyncEngine().finally(() => {
+  activeRun = runSyncEngine(reason).finally(() => {
     activeRun = null;
     notifyListeners();
   });

@@ -15,14 +15,31 @@ export async function getVisibleItems() {
   const items = await getAllItems();
 
   return items
-    .filter((item) => !item.isTrashed)
+    .filter((item) => !item.isTrashed && !item.needsRemoteDelete)
     .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+}
+
+export async function getTrashedItems() {
+  const items = await getAllItems();
+
+  return items
+    .filter((item) => item.isTrashed && !item.needsRemoteDelete)
+    .sort((left, right) => {
+      const leftTimestamp = left.trashedAt ?? left.updatedAt;
+      const rightTimestamp = right.trashedAt ?? right.updatedAt;
+      return rightTimestamp.localeCompare(leftTimestamp);
+    });
 }
 
 export async function createItem(item: LocalItem) {
   const database = await getDatabase();
   await database.put(ITEM_STORE_NAME, item);
   return item;
+}
+
+export async function removeItem(id: string) {
+  const database = await getDatabase();
+  await database.delete(ITEM_STORE_NAME, id);
 }
 
 export function saveItem(item: LocalItem) {
@@ -51,9 +68,35 @@ export async function markItemTrashed(id: string, trashedAt: string) {
   return updateItem(id, {
     isTrashed: true,
     needsRemoteUpdate: true,
+    needsRemoteDelete: false,
     syncState: "pending_sync",
     trashedAt,
     updatedAt: trashedAt,
+  });
+}
+
+export async function markItemPendingRemoteDelete(id: string, deletedAt: string) {
+  return updateItem(id, {
+    needsRemoteCreate: false,
+    needsRemoteDelete: true,
+    needsRemoteUpdate: false,
+    syncErrorMessage: null,
+    syncState: "pending_sync",
+    updatedAt: deletedAt,
+  });
+}
+
+export function markItemRemotelyTrashed(id: string, observedAt: string) {
+  return updateItem(id, {
+    isTrashed: true,
+    lastSyncedAt: observedAt,
+    needsRemoteCreate: false,
+    needsRemoteDelete: false,
+    needsRemoteUpdate: false,
+    syncErrorMessage: null,
+    syncState: "synced",
+    trashedAt: observedAt,
+    updatedAt: observedAt,
   });
 }
 
@@ -78,6 +121,7 @@ export function setItemSynced(
   return updateItem(id, {
     lastSyncedAt: syncedAt,
     needsRemoteCreate: false,
+    needsRemoteDelete: false,
     needsRemoteUpdate: false,
     syncErrorMessage: null,
     syncState: "synced",

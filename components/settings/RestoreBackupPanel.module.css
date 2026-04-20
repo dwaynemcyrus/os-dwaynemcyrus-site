@@ -1,0 +1,67 @@
+.restorePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+}
+
+.restorePanel__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.restorePanel__eyebrow {
+  color: var(--color-muted);
+}
+
+.restorePanel__message {
+  line-height: 1.5;
+}
+
+.restorePanel__hint {
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.restorePanel__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.restorePanel__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.restorePanel__input {
+  min-height: 2.75rem;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-foreground);
+}
+
+.restorePanel__input:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.restorePanel__preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.restorePanel__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.restorePanel__error {
+  line-height: 1.5;
+}

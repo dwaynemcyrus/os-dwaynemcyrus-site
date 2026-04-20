@@ -1,7 +1,10 @@
 import {
+  getAllItems,
   getFailedSyncItems,
   getItemById,
   getPendingSyncItems,
+  markItemRemotelyTrashed,
+  removeItem,
   saveItem,
   setItemSynced,
   setItemSyncError,
@@ -18,6 +21,16 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createTimestamp } from "@/lib/utils/datetime";
 
 export type SyncSkipReason = "missing-auth" | "missing-env" | "offline" | null;
+export type SyncRunReason =
+  | "app-load"
+  | "capture"
+  | "delete"
+  | "foreground"
+  | "manual"
+  | "reconnect"
+  | "restore"
+  | "retry"
+  | "trash";
 
 export type SyncRunResult = {
   attemptedCount: number;
@@ -44,6 +57,10 @@ function shouldKeepLocalVersion(
   localItem: LocalItem,
   remoteRecord: RemoteItemRecord,
 ) {
+  if (localItem.needsRemoteDelete) {
+    return true;
+  }
+
   const localIsUnsynced =
     localItem.syncState === "pending_sync" || localItem.syncState === "sync_error";
 
@@ -56,6 +73,7 @@ function shouldKeepLocalVersion(
 
 async function pullRemoteItems(
   userId: string,
+  reason: SyncRunReason,
 ): Promise<{ failedCount: number; pulledCount: number }> {
   const supabase = getSupabaseBrowserClient();
 
@@ -79,9 +97,10 @@ async function pullRemoteItems(
     };
   }
 
+  const remoteRecords = (data ?? []) as RemoteItemRecord[];
   let pulledCount = 0;
 
-  for (const remoteRecord of (data ?? []) as RemoteItemRecord[]) {
+  for (const remoteRecord of remoteRecords) {
     const localItem = await getItemById(remoteRecord.id);
 
     if (localItem && shouldKeepLocalVersion(localItem, remoteRecord)) {
@@ -100,13 +119,80 @@ async function pullRemoteItems(
     pulledCount += 1;
   }
 
+  if (reason === "manual") {
+    const localItems = await getAllItems();
+    const remoteIds = new Set(remoteRecords.map((item) => item.id));
+
+    for (const localItem of localItems) {
+      if (localItem.userId !== userId) {
+        continue;
+      }
+
+      if (remoteIds.has(localItem.id)) {
+        continue;
+      }
+
+      const localIsUnsynced =
+        localItem.syncState === "pending_sync" ||
+        localItem.syncState === "sync_error" ||
+        localItem.needsRemoteDelete ||
+        localItem.needsRemoteCreate ||
+        localItem.needsRemoteUpdate;
+
+      if (localIsUnsynced || localItem.isTrashed) {
+        continue;
+      }
+
+      await markItemRemotelyTrashed(localItem.id, createTimestamp());
+      pulledCount += 1;
+    }
+  }
+
   return {
     failedCount: 0,
     pulledCount,
   };
 }
 
-export async function runSyncEngine(): Promise<SyncRunResult> {
+async function syncPendingDeletes(userId: string) {
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    return {
+      failedCount: 0,
+      syncedCount: 0,
+    };
+  }
+
+  const localItems = await getAllItems();
+  const deleteCandidates = localItems.filter((item) => item.needsRemoteDelete);
+  let failedCount = 0;
+  let syncedCount = 0;
+
+  for (const item of deleteCandidates) {
+    const { error } = await supabase
+      .from("items")
+      .delete()
+      .eq("id", item.id)
+      .eq("user_id", userId);
+
+    if (error) {
+      failedCount += 1;
+      await setItemSyncError(item.id, error.message);
+      continue;
+    }
+
+    await removeItem(item.id);
+    syncedCount += 1;
+  }
+
+  return {
+    failedCount,
+    syncedCount,
+  };
+}
+
+export async function runSyncEngine(reason: SyncRunReason): Promise<SyncRunResult> {
   const supabase = getSupabaseBrowserClient();
 
   if (!supabase) {
@@ -129,16 +215,21 @@ export async function runSyncEngine(): Promise<SyncRunResult> {
     };
   }
 
-  const pullResult = await pullRemoteItems(userId);
+  const deleteResult = await syncPendingDeletes(userId);
+  const pullResult = await pullRemoteItems(userId, reason);
 
   const [failedItems, pendingItems] = await Promise.all([
     getFailedSyncItems(),
     getPendingSyncItems(),
   ]);
 
-  const items = sortSyncCandidates(mergeUniqueItems([...pendingItems, ...failedItems]));
-  let failedCount = pullResult.failedCount;
-  let syncedCount = 0;
+  const items = sortSyncCandidates(
+    mergeUniqueItems([...pendingItems, ...failedItems]).filter(
+      (item) => !item.needsRemoteDelete,
+    ),
+  );
+  let failedCount = pullResult.failedCount + deleteResult.failedCount;
+  let syncedCount = deleteResult.syncedCount;
 
   for (const item of items) {
     const syncedAt = createTimestamp();
@@ -157,7 +248,7 @@ export async function runSyncEngine(): Promise<SyncRunResult> {
     await setItemSynced(item.id, syncedAt, userId);
   }
 
-  if (items.length > 0 || pullResult.pulledCount > 0) {
+  if (items.length > 0 || pullResult.pulledCount > 0 || deleteResult.syncedCount > 0) {
     notifyItemsChanged();
   }
 

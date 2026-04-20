@@ -1,4 +1,10 @@
-import { createItem, markItemTrashed } from "@/lib/db/itemRepository";
+import {
+  createItem,
+  getItemById,
+  markItemPendingRemoteDelete,
+  markItemTrashed,
+  removeItem,
+} from "@/lib/db/itemRepository";
 import { notifyItemsChanged } from "@/lib/items/itemEvents";
 import {
   DEFAULT_ITEM_STATUS,
@@ -26,6 +32,7 @@ export async function createCapturedItem({ content }: CreateLocalItemInput) {
     isTrashed: false,
     lastSyncedAt: null,
     needsRemoteCreate: true,
+    needsRemoteDelete: false,
     needsRemoteUpdate: false,
     status: DEFAULT_ITEM_STATUS,
     syncErrorMessage: null,
@@ -49,6 +56,29 @@ export async function trashItem(id: string) {
   void runSyncQueue("trash");
 
   return item;
+}
+
+export async function hardDeleteItem(id: string) {
+  const item = await getItemById(id);
+
+  if (!item) {
+    throw new Error("The item was not found.");
+  }
+
+  if (!item.isTrashed) {
+    throw new Error("Only trashed items can be deleted permanently.");
+  }
+
+  if (item.needsRemoteCreate && !item.lastSyncedAt) {
+    await removeItem(id);
+    notifyItemsChanged();
+    return;
+  }
+
+  await markItemPendingRemoteDelete(id, createTimestamp());
+
+  notifyItemsChanged();
+  void runSyncQueue("delete");
 }
 
 export function retryFailedSync() {

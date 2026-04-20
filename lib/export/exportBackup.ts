@@ -1,30 +1,12 @@
+import {
+  BACKUP_REMOTE_COLUMNS,
+  PSA_BACKUP_FORMAT,
+  type BackupItem,
+  type BackupPayload,
+} from "@/lib/backup/backupTypes";
 import type { RemoteItemRecord } from "@/lib/items/itemMappers";
 import { getAuthenticatedUserId } from "@/lib/supabase/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-
-export type ExportBackupItem = {
-  content: string;
-  createdAt: string;
-  deviceCreatedAt: string;
-  deviceUpdatedAt: string;
-  id: string;
-  isTrashed: boolean;
-  lastSyncedAt: string | null;
-  status: string;
-  syncState: string;
-  trashedAt: string | null;
-  type: string;
-  updatedAt: string;
-  userId: string;
-};
-
-export type ExportBackupPayload = {
-  exportedAt: string;
-  format: "psa-backup.v1";
-  items: ExportBackupItem[];
-  source: "supabase";
-  userId: string;
-};
 
 export type ExportBackupResult = {
   exportedAt: string;
@@ -32,23 +14,7 @@ export type ExportBackupResult = {
   itemCount: number;
 };
 
-const EXPORT_COLUMNS = [
-  "id",
-  "user_id",
-  "content",
-  "type",
-  "status",
-  "created_at",
-  "updated_at",
-  "device_created_at",
-  "device_updated_at",
-  "sync_state",
-  "last_synced_at",
-  "is_trashed",
-  "trashed_at",
-].join(", ");
-
-function mapRemoteRecordToExportItem(record: RemoteItemRecord): ExportBackupItem {
+function mapRemoteRecordToExportItem(record: RemoteItemRecord): BackupItem {
   return {
     content: record.content,
     createdAt: record.created_at,
@@ -75,7 +41,7 @@ function createBackupFilename(exportedAt: string) {
   return `psa-backup-${timestamp}.json`;
 }
 
-function downloadBackupPayload(filename: string, payload: ExportBackupPayload) {
+function downloadBackupPayload(filename: string, payload: BackupPayload) {
   if (typeof document === "undefined" || typeof URL === "undefined") {
     throw new Error("Backup export is only available in the browser.");
   }
@@ -112,7 +78,7 @@ export async function exportAuthenticatedBackup(): Promise<ExportBackupResult> {
 
   const { data, error } = await supabase
     .from("items")
-    .select(EXPORT_COLUMNS)
+    .select(BACKUP_REMOTE_COLUMNS)
     .eq("user_id", userId)
     .order("created_at", { ascending: true })
     .returns<RemoteItemRecord[]>();
@@ -123,9 +89,9 @@ export async function exportAuthenticatedBackup(): Promise<ExportBackupResult> {
 
   const exportedAt = new Date().toISOString();
   const records = data ?? [];
-  const payload: ExportBackupPayload = {
+  const payload: BackupPayload = {
     exportedAt,
-    format: "psa-backup.v1",
+    format: PSA_BACKUP_FORMAT,
     items: records.map(mapRemoteRecordToExportItem),
     source: "supabase",
     userId,

@@ -1,0 +1,42 @@
+.deleteItemDialog__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.deleteItemDialog__content {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: min(90vw, 32rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  transform: translate(-50%, -50%);
+}
+
+.deleteItemDialog__title {
+  font-size: 1rem;
+}
+
+.deleteItemDialog__description,
+.deleteItemDialog__preview {
+  line-height: 1.5;
+}
+
+.deleteItemDialog__preview {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  white-space: pre-wrap;
+}
+
+.deleteItemDialog__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}

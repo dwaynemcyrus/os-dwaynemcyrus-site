@@ -11,10 +11,10 @@ expanding into email-based recovery infrastructure or broader account settings.
 
 ## Status
 
-- current
-- active
-- implementation should follow this file while
-  `docs/agents/build-spec.md` points here
+- implemented
+- not active
+- keep this file as the prior milestone reference while
+  `docs/agents/build-spec.md` points to the next current build
 
 ---
 

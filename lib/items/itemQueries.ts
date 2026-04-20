@@ -1,9 +1,17 @@
-import type { SyncStatusLabel } from "@/lib/constants/labels";
 import { LABELS } from "@/lib/constants/labels";
-import { getItemsBySyncState, getVisibleItems } from "@/lib/db/itemRepository";
+import type { SyncStatusLabel } from "@/lib/constants/labels";
+import {
+  getItemsBySyncState,
+  getTrashedItems,
+  getVisibleItems,
+} from "@/lib/db/itemRepository";
 
 export function getVisibleBacklogItems() {
   return getVisibleItems();
+}
+
+export function getTrashedBacklogItems() {
+  return getTrashedItems();
 }
 
 export async function getSyncCounts() {

@@ -25,6 +25,7 @@ export type LocalItem = {
   isTrashed: boolean;
   lastSyncedAt: string | null;
   needsRemoteCreate: boolean;
+  needsRemoteDelete: boolean;
   needsRemoteUpdate: boolean;
   status: ItemStatus;
   syncErrorMessage: string | null;

@@ -3,6 +3,7 @@
 import { AppShell } from "@/components/app-shell/AppShell";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { BackButton } from "@/components/navigation/BackButton";
+import { RestoreBackupPanel } from "@/components/settings/RestoreBackupPanel";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
 import { LABELS } from "@/lib/constants/labels";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
@@ -24,6 +25,7 @@ export default function SettingsPage() {
       title={LABELS.settings}
     >
       <SettingsPanel />
+      <RestoreBackupPanel />
     </AppShell>
   );
 }

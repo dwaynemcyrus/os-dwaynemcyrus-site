@@ -48,6 +48,7 @@ export function mapRemoteRecordToLocalItem(record: RemoteItemRecord): LocalItem 
     isTrashed: record.is_trashed,
     lastSyncedAt: record.last_synced_at,
     needsRemoteCreate: false,
+    needsRemoteDelete: false,
     needsRemoteUpdate: false,
     status: record.status,
     syncErrorMessage: null,

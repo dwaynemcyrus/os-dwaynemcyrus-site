@@ -7,11 +7,20 @@ All notable commit-ready changes to this project should be recorded here.
 ### Added
 - Signed-in JSON backup export from canonical Supabase rows with a direct browser download flow.
 - Signed-in password change flow on `/settings` with double-entry confirmation for this single-user app.
+- Signed-in import/restore flow on `/settings` with PSA backup validation, explicit confirmation, local-first restore writes, and immediate background sync for imported items.
+- Dedicated `/trash` route for reviewing trashed items and permanently deleting them with confirmation.
 
 ### Changed
 - Promoted `docs/build-specs/build-spec-v2-export-backup.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v2-account-recovery.md` to the current build in the build-spec entrypoint.
+- Promoted `docs/build-specs/build-spec-v3-import-restore.md` to the current build in the build-spec entrypoint.
 - Removed the incomplete email-based reset flow and re-scoped the current auth milestone around signed-in password change plus manual locked-out recovery.
+- Extended the current `v3` build to include a dedicated trash route and local-first permanent delete semantics.
+
+### Fixed
+- Cleared stale local Supabase sessions automatically when the browser encounters an invalid refresh-token error during session bootstrap.
+- Mirrored rows manually deleted from Supabase as locally trashed items on explicit manual refresh, while protecting unsynced local rows from accidental loss.
+- Synced confirmed permanent deletes from `/trash` to Supabase in the background while hiding deleted items from local lists immediately.
 
 ### Docs
 - Added a non-current `build-spec-v3-import-restore.md` to define the next planned restore milestone.

@@ -6,6 +6,31 @@ type AuthCredentials = {
   password: string;
 };
 
+function isInvalidRefreshTokenErrorMessage(message: string) {
+  const normalizedMessage = message.toLowerCase();
+
+  return (
+    normalizedMessage.includes("invalid refresh token") ||
+    normalizedMessage.includes("refresh token not found")
+  );
+}
+
+async function clearStaleLocalSession() {
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    return;
+  }
+
+  try {
+    await supabase.auth.signOut({
+      scope: "local",
+    });
+  } catch {
+    // Ignore cleanup failures. The caller will treat the session as missing.
+  }
+}
+
 export async function getAuthenticatedUserId() {
   const supabase = getSupabaseBrowserClient();
 
@@ -15,7 +40,15 @@ export async function getAuthenticatedUserId() {
 
   const { data, error } = await supabase.auth.getUser();
 
-  if (error || !data.user) {
+  if (error) {
+    if (isInvalidRefreshTokenErrorMessage(error.message)) {
+      await clearStaleLocalSession();
+    }
+
+    return null;
+  }
+
+  if (!data.user) {
     return null;
   }
 
@@ -37,6 +70,10 @@ export async function getCurrentSession() {
   const { data, error } = await supabase.auth.getSession();
 
   if (error) {
+    if (isInvalidRefreshTokenErrorMessage(error.message)) {
+      await clearStaleLocalSession();
+    }
+
     return null;
   }
 

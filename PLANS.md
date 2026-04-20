@@ -4,12 +4,8 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Active
 
-- None currently.
-
 ## Backlog
-
-- [ ] Manually validate signed-in password change on the deployed `/settings` route.
-- [ ] Activate and implement `build-spec-v3-import-restore.md` when restore becomes the next milestone.
+- None currently.
 
 ## Completed
 
@@ -76,3 +72,23 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-20 — Future import/restore build spec
 - Status: completed
 - Summary: added a non-current `build-spec-v3-import-restore.md` defining the next portability milestone around validated JSON import/restore and last-write-wins restoration by item id.
+
+### 2026-04-20 — V3 import/restore activation
+- Status: completed
+- Summary: promoted `build-spec-v3-import-restore.md` to the current build and moved the prior account-recovery build into implemented-reference status.
+
+### 2026-04-20 — V3 import/restore implementation
+- Status: completed
+- Summary: implemented validated PSA JSON restore on `/settings`, added explicit confirmation and result messaging, compared imported rows against both local and remote state, restored locally first, and queued newer imported rows for background sync.
+
+### 2026-04-20 — Stale local Supabase session cleanup
+- Status: completed
+- Summary: detected invalid local refresh-token errors during browser session bootstrap, cleared the stale local Supabase session automatically, and verified the auth cleanup with `npm run build` plus `npm run lint`.
+
+### 2026-04-20 — Remote deletion reconciliation
+- Status: completed
+- Summary: reconciled rows manually deleted from Supabase by mirroring them as local trash on explicit manual refresh only, while protecting unsynced local rows from accidental loss.
+
+### 2026-04-20 — Trash route and hard delete
+- Status: completed
+- Summary: added a dedicated `/trash` route for trashed items, required confirmation before permanent delete, removed deleted items from local lists immediately, and synced the matching Supabase delete in the background.

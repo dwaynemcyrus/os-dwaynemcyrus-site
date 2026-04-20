@@ -41,6 +41,17 @@ future sessions do not need to rediscover them.
   - `.gitignore`
   - `supabase/migrations/20260418130000_create_items.sql`
 
+### Stale local Supabase refresh tokens should be cleared automatically
+- Status: active
+- First seen: 2026-04-20
+- Last seen: 2026-04-20
+- Symptom: the browser console shows `Invalid Refresh Token: Refresh Token Not Found` and session bootstrap keeps trying to refresh a dead local token.
+- Root cause: a previously rotated or invalidated Supabase session remains in local browser storage, and `getSession()` or `getUser()` attempts to refresh it on startup.
+- Resolution: detect the specific invalid-refresh-token error, clear the local Supabase session with local sign-out, and treat the session as missing.
+- Prevention: on auth bootstrap, do not surface invalid local refresh-token state as an application error; clear it narrowly and continue signed out.
+- References:
+  - `lib/supabase/auth.ts`
+
 ## Build / CI
 
 - None currently.
@@ -112,6 +123,42 @@ future sessions do not need to rediscover them.
 - References:
   - `lib/export/exportBackup.ts`
   - `docs/build-specs/build-spec-v2-export-backup.md`
+
+### Restore imports must compare against remote rows before queueing sync
+- Status: active
+- First seen: 2026-04-20
+- Last seen: 2026-04-20
+- Symptom: a restored backup can overwrite newer canonical data if imported rows are blindly marked pending and pushed immediately.
+- Root cause: restore operates on exported snapshots, while the signed-in account may already contain newer remote rows than the backup file.
+- Resolution: compare imported items against both local and remote state first; skip older backup rows, keep local rows on exact timestamp ties, and only queue sync for imported rows that are actually newer than the current remote version or absent remotely.
+- Prevention: never treat restore as a pure local file import followed by unconditional sync; restore must understand remote freshness before scheduling writes.
+- References:
+  - `lib/backup/restoreBackup.ts`
+  - `lib/sync/syncEngine.ts`
+
+### Remote deletions should reconcile only on explicit manual refresh
+- Status: active
+- First seen: 2026-04-20
+- Last seen: 2026-04-20
+- Symptom: rows manually removed from Supabase remain visible locally even after a normal sync cycle, or destructive reconciliation risks wiping unsynced device-only data.
+- Root cause: the baseline sync engine pulls existing remote rows but should not silently treat remote absence as destructive on every background sync trigger.
+- Resolution: mirror remote absence as local trash only during an explicit manual refresh, and only for rows already fully synced locally; never apply that rule to pending or errored local rows.
+- Prevention: keep background sync non-destructive by default and reserve remote-deletion reconciliation for deliberate user refresh actions.
+- References:
+  - `lib/sync/syncEngine.ts`
+  - `lib/db/itemRepository.ts`
+
+### Permanent delete needs a local tombstone until remote delete succeeds
+- Status: active
+- First seen: 2026-04-20
+- Last seen: 2026-04-20
+- Symptom: a local-first hard delete can disappear from IndexedDB before the app has enough information left to delete the matching Supabase row.
+- Root cause: physically removing the row from local storage immediately destroys the identifier and sync flags the background delete path needs.
+- Resolution: mark the item as a hidden pending remote delete locally, process the Supabase delete first in the sync engine, and only remove the IndexedDB row after the remote delete succeeds.
+- Prevention: for destructive remote actions, do not equate "hide from UI now" with "erase from local persistence now"; preserve a tombstone until sync completion.
+- References:
+  - `lib/db/itemRepository.ts`
+  - `lib/sync/syncEngine.ts`
 
 ## Deployment
 

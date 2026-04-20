@@ -4,8 +4,6 @@
 
 Define the next portability milestone after `build-spec-v2-export-backup.md`.
 
-This build is not current yet.
-
 It exists to let the user bring a previously exported PSA backup back into the
 system deliberately and safely, without silently merging or overwriting data.
 
@@ -13,10 +11,10 @@ system deliberately and safely, without silently merging or overwriting data.
 
 ## Status
 
-- planned
-- not active
-- do not implement by default while `docs/agents/build-spec.md` still points to
-  `build-spec-v2-account-recovery.md`
+- current
+- active
+- implementation should follow this file while
+  `docs/agents/build-spec.md` points here
 
 ---
 
@@ -44,6 +42,8 @@ That is a product-level data-integrity feature, not a small extension of export.
 - explicit restore confirmation UX
 - safe import behavior into local storage and canonical Supabase-backed account data
 - clear success and failure messaging
+- a dedicated `/trash` route for reviewing trashed items
+- confirmed permanent delete from the trashed-items route only
 
 ---
 
@@ -55,6 +55,7 @@ That is a product-level data-integrity feature, not a small extension of export.
 - collaborative or multi-user import behavior
 - partial-field conflict resolution UI
 - backup scheduling
+- permanent delete directly from the normal `/list` route
 
 ---
 
@@ -94,9 +95,21 @@ The restore model should assume:
 Recommended first strategy:
 
 - import validated items into the signed-in account by item `id`
+- remap imported `userId` values to the currently authenticated user
 - last-write-wins by `updatedAt` when the same item already exists
+- keep the existing local row on exact timestamp ties
 - preserve local-first safety by writing locally first, then syncing
+- trigger background sync immediately after local restore completes
 - do not hard-delete existing items that are absent from the backup
+
+Permanent delete strategy:
+
+- only allow permanent delete for items already in trash
+- expose permanent delete only on `/trash`
+- require explicit confirmation before delete
+- remove the item from visible local lists immediately
+- preserve enough local tombstone state to delete the matching Supabase row in the background
+- do not bypass soft-trash as the normal deletion path
 
 ---
 
@@ -130,6 +143,8 @@ for item reconstruction, but it must reject malformed or incomplete item data.
 - restore must not imply that arbitrary JSON files are supported
 - restore must not bypass the local-first data model
 - restore messaging must make the chosen merge strategy explicit
+- permanent delete must not be available from `/list`
+- destructive remote deletion must remain local-first and confirmation-gated
 
 ---
 
