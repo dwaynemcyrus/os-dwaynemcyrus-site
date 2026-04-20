@@ -16,6 +16,7 @@ All notable commit-ready changes to this project should be recorded here.
 - Promoted `docs/build-specs/build-spec-v3-import-restore.md` to the current build in the build-spec entrypoint.
 - Removed the incomplete email-based reset flow and re-scoped the current auth milestone around signed-in password change plus manual locked-out recovery.
 - Extended the current `v3` build to include a dedicated trash route and local-first permanent delete semantics.
+- Moved the `Open Trash` control into its own settings section instead of grouping it with password-change actions.
 
 ### Fixed
 - Cleared stale local Supabase sessions automatically when the browser encounters an invalid refresh-token error during session bootstrap.

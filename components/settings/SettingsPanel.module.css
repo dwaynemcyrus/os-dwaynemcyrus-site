@@ -12,6 +12,14 @@
   gap: var(--space-2);
 }
 
+.settingsPanel__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
 .settingsPanel__eyebrow {
   color: var(--color-muted);
 }

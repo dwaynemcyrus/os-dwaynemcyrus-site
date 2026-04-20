@@ -100,3 +100,7 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-20 — Restore result UI summary
 - Status: completed
 - Summary: replaced the dense restore-result sentence with a stat-style summary block in the restore panel so backup processing is easier to scan.
+
+### 2026-04-20 — Settings trash section
+- Status: completed
+- Summary: moved the `Open Trash` control out of the password-change action group and into its own settings section on `/settings`.

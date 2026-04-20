@@ -90,9 +90,6 @@ export function SettingsPanel() {
         </label>
       </div>
       <div className={styles.settingsPanel__list}>
-        <TextButton href="/trash" variant="secondary">
-          {LABELS.openTrash}
-        </TextButton>
         <TextButton
           disabled={isDisabled}
           onPress={() => {
@@ -104,6 +101,19 @@ export function SettingsPanel() {
       </div>
       {errorMessage ? <p className={styles.settingsPanel__error}>{errorMessage}</p> : null}
       {infoMessage ? <p className={styles.settingsPanel__hint}>{infoMessage}</p> : null}
+      <div className={styles.settingsPanel__section}>
+        <div className={styles.settingsPanel__copy}>
+          <p className={styles.settingsPanel__eyebrow}>{LABELS.trash}</p>
+          <p className={styles.settingsPanel__message}>
+            Review trashed items before deciding whether to delete them permanently.
+          </p>
+        </div>
+        <div className={styles.settingsPanel__list}>
+          <TextButton href="/trash" variant="secondary">
+            {LABELS.openTrash}
+          </TextButton>
+        </div>
+      </div>
     </section>
   );
 }
