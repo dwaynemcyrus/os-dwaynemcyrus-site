@@ -4,8 +4,8 @@
 
 Define the next recovery milestone after `build-spec-v1-capture.md`.
 
-It exists to add a proper account-recovery path for the existing password-based
-authentication model without expanding into broader account settings.
+It exists to tighten the single-user password model for this app without
+expanding into email-based recovery infrastructure or broader account settings.
 
 ---
 
@@ -28,7 +28,8 @@ The current build proves:
 
 This next build adds a different guarantee:
 
-- the user can recover access if they forget their password
+- the signed-in user can change their password safely
+- locked-out recovery is defined explicitly as a manual admin action
 
 That is an account-lifecycle feature, not sync or portability work.
 
@@ -36,28 +37,30 @@ That is an account-lifecycle feature, not sync or portability work.
 
 ## Included
 
-- forgot-password request flow
-- reset-password completion flow
-- clear recovery messaging for success and failure states
-- Supabase-compatible redirect handling for password reset
+- signed-in change-password flow
+- double-entry password confirmation before submission
+- clear success and failure messaging for password changes
+- explicit documentation that locked-out recovery is manual through Supabase
 
 ---
 
 ## Excluded
 
-- change-password while already signed in
+- forgot-password email request flow
+- reset-link completion flow
 - broader account settings
 - email-address change
 - multi-factor authentication
 - profile editing
+- SMTP setup
 
 ---
 
 ## Product Goals
 
-- the user can recover account access without manual intervention
+- the signed-in user can rotate their password without leaving the app
+- the auth surface stays honest about what the app can and cannot recover on its own
 - the flow stays compact and does not introduce a large account-management surface
-- reset behavior is explicit and understandable
 
 ---
 
@@ -65,12 +68,12 @@ That is an account-lifecycle feature, not sync or portability work.
 
 The first release of this build should provide:
 
-- a visible forgot-password entry point
-- password reset email request flow
-- reset-link completion flow
-- confirmation and error messaging that matches Supabase Auth behavior
+- a visible settings route
+- a signed-in change-password form
+- confirmation and error messaging for password update
+- double-entry password confirmation
 
-The first release should not include change-password settings for authenticated users.
+The first release should not include self-service forgot-password recovery.
 
 ---
 
@@ -78,29 +81,28 @@ The first release should not include change-password settings for authenticated 
 
 The recovery model should assume:
 
-- Supabase Auth remains the source of truth for password recovery
-- the app must honor the project’s site URL and redirect URL configuration
-- the forgot-password request entry point lives in the home account surface
-- reset-link completion happens on `/settings/reset-password`
-- `/settings` may list the available settings routes, but broader account settings
-  remain out of scope
+- Supabase Auth remains the source of truth for password updates
+- the user is the only intended account holder for the app
+- `/settings` is the visible account-management route
+- password changes happen only while signed in
+- true locked-out recovery is manual through the Supabase dashboard or admin API
 
 ---
 
 ## Rules
 
-- recovery must operate on the authenticated account system already in use
-- recovery messaging must not imply account deletion, export, or restore behavior
-- reset completion must be clearly separated from normal sign-in
+- password change must operate on the authenticated account system already in use
+- messaging must not imply email recovery, export, or restore behavior
+- signed-out users must not be shown a fake self-service recovery path
 - broader account settings must remain out of scope
 
 ---
 
 ## Risks
 
-- redirect settings drift can silently break recovery emails
-- weak messaging can confuse reset state with normal sign-in state
-- blending reset and broader account settings can expand scope quickly
+- weak messaging can confuse signed-in password change with locked-out recovery
+- leaving dead reset-email routes in the app would create false expectations
+- blending password change and broader account settings can expand scope quickly
 
 ---
 

@@ -61,10 +61,6 @@
   line-height: 1.5;
 }
 
-.authPanel__utilityAction {
-  justify-content: flex-start;
-}
-
 @media (max-width: 480px) {
   .authPanel__actions {
     grid-template-columns: 1fr;

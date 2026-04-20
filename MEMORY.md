@@ -127,6 +127,18 @@ future sessions do not need to rediscover them.
   - `.env.local`
   - `lib/supabase/auth.ts`
 
+### Single-user password apps should not pretend to offer self-service recovery without email infrastructure
+- Status: active
+- First seen: 2026-04-20
+- Last seen: 2026-04-20
+- Symptom: the UI can imply that locked-out users can reset their password even though no production email channel exists to deliver a recovery link.
+- Root cause: reusing a generic consumer-auth pattern in a single-user app that intentionally avoids SMTP or other external recovery factors.
+- Resolution: keep only signed-in password change in the app and document locked-out recovery as a manual Supabase dashboard or admin action.
+- Prevention: do not add a `Forgot password` surface unless the project has a real recovery channel configured and tested.
+- References:
+  - `docs/build-specs/build-spec-v2-account-recovery.md`
+  - `components/settings/SettingsPanel.tsx`
+
 ## Known Constraints
 
 ### Active build spec must be in the mandatory read order

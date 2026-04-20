@@ -1,4 +1,4 @@
-import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import type { Session } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type AuthCredentials = {
@@ -90,25 +90,6 @@ export async function signInWithPassword(credentials: AuthCredentials) {
   return data.session;
 }
 
-export async function requestPasswordResetForEmail(
-  email: string,
-  emailRedirectTo: string,
-) {
-  const supabase = getSupabaseBrowserClient();
-
-  if (!supabase) {
-    throw new Error("Supabase is not configured.");
-  }
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: emailRedirectTo,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
-
 export async function updateCurrentUserPassword(password: string) {
   const supabase = getSupabaseBrowserClient();
 
@@ -144,14 +125,6 @@ export async function signOutCurrentUser() {
 export function subscribeToAuthStateChanges(
   listener: (session: Session | null) => void,
 ) {
-  return subscribeToAuthEvents((_event, session) => {
-    listener(session);
-  });
-}
-
-export function subscribeToAuthEvents(
-  listener: (event: AuthChangeEvent, session: Session | null) => void,
-) {
   const supabase = getSupabaseBrowserClient();
 
   if (!supabase) {
@@ -161,7 +134,7 @@ export function subscribeToAuthEvents(
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((_event, session) => {
-    listener(_event, session);
+    listener(session);
   });
 
   return () => {

@@ -19,7 +19,6 @@ export function AuthPanel() {
     infoMessage,
     isLoading,
     isSubmitting,
-    requestPasswordReset,
     signIn,
     signOut,
     user,
@@ -33,8 +32,6 @@ export function AuthPanel() {
   const normalizedEmail = normalizeEmail(email);
   const isDisabled =
     isLoading || isSubmitting || normalizedEmail.length === 0 || password.length < 8;
-  const isRecoveryDisabled =
-    isLoading || isSubmitting || normalizedEmail.length === 0;
 
   async function handleExportBackup() {
     setExportErrorMessage("");
@@ -160,16 +157,6 @@ export function AuthPanel() {
           {LABELS.createAccount}
         </TextButton>
       </div>
-      <TextButton
-        className={styles.authPanel__utilityAction}
-        disabled={isRecoveryDisabled}
-        onPress={() => {
-          void requestPasswordReset(normalizedEmail);
-        }}
-        variant="ghost"
-      >
-        {LABELS.forgotPassword}
-      </TextButton>
       {errorMessage ? (
         <p className={styles.authPanel__error}>{errorMessage}</p>
       ) : null}

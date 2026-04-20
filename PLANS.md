@@ -8,7 +8,7 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Backlog
 
-- [ ] Manually validate the deployed password-reset email flow against `https://os.dwaynemcyrus.com/settings/reset-password`.
+- [ ] Manually validate signed-in password change on the deployed `/settings` route.
 
 ## Completed
 
@@ -67,3 +67,7 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-19 — V2 account-recovery implementation
 - Status: completed
 - Summary: promoted `build-spec-v2-account-recovery.md` to the current build, added a forgot-password request flow on `/`, added `/settings` and `/settings/reset-password`, completed reset handling through Supabase recovery state, and verified `npm run build` plus `npm run lint`.
+
+### 2026-04-20 — Single-user auth cleanup
+- Status: completed
+- Summary: removed the email-based reset flow, deleted `/settings/reset-password`, replaced it with a signed-in password change form on `/settings`, documented locked-out recovery as a manual Supabase action, and verified `npm run build` plus `npm run lint`.
