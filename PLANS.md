@@ -92,3 +92,11 @@ This file tracks active and historical execution plans for non-trivial work.
 ### 2026-04-20 — Trash route and hard delete
 - Status: completed
 - Summary: added a dedicated `/trash` route for trashed items, required confirmation before permanent delete, removed deleted items from local lists immediately, and synced the matching Supabase delete in the background.
+
+### 2026-04-20 — Restore result clarity
+- Status: completed
+- Summary: clarified restore reporting so backup processing shows total backup entries plus matched, newer-local, newer-remote, reused-remote, and queued-for-sync counts instead of one opaque skipped total.
+
+### 2026-04-20 — Restore result UI summary
+- Status: completed
+- Summary: replaced the dense restore-result sentence with a stat-style summary block in the restore panel so backup processing is easier to scan.

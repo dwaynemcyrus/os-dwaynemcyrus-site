@@ -6,22 +6,33 @@ import { LABELS } from "@/lib/constants/labels";
 import {
   previewBackupFile,
   restoreAuthenticatedBackup,
+  type RestoreBackupResult,
 } from "@/lib/backup/restoreBackup";
 import { useAuthSession } from "@/lib/hooks/useAuthSession";
 import styles from "./RestoreBackupPanel.module.css";
 
 type BackupPreview = Awaited<ReturnType<typeof previewBackupFile>>;
+type RestoreSummary = Pick<
+  RestoreBackupResult,
+  | "backupItemCount"
+  | "importedCount"
+  | "queuedForSyncCount"
+  | "skippedEqualLocalCount"
+  | "skippedNewerLocalCount"
+  | "skippedNewerRemoteCount"
+  | "syncedParityCount"
+>;
 
 export function RestoreBackupPanel() {
   const { hasSession, isLoading, user } = useAuthSession();
   const [errorMessage, setErrorMessage] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState<BackupPreview | null>(null);
+  const [restoreSummary, setRestoreSummary] = useState<RestoreSummary | null>(null);
 
   async function handleFileChange(file: File | null) {
     setErrorMessage("");
-    setInfoMessage("");
+    setRestoreSummary(null);
     setPreview(null);
 
     if (!file) {
@@ -42,26 +53,22 @@ export function RestoreBackupPanel() {
   async function handleRestore() {
     if (!preview) {
       setErrorMessage("Choose a valid PSA backup before restoring.");
-      setInfoMessage("");
       return;
     }
 
     if (!hasSession) {
       setErrorMessage("Sign in before restoring a backup.");
-      setInfoMessage("");
       return;
     }
 
     setErrorMessage("");
-    setInfoMessage("");
+    setRestoreSummary(null);
     setIsSubmitting(true);
 
     try {
       const result = await restoreAuthenticatedBackup(preview.payload);
 
-      setInfoMessage(
-        `Restored ${result.importedCount} items, skipped ${result.skippedCount}, and queued ${result.queuedForSyncCount} for sync.`,
-      );
+      setRestoreSummary(result);
       setPreview(null);
     } catch (error) {
       const message =
@@ -123,8 +130,56 @@ export function RestoreBackupPanel() {
           {LABELS.restoreBackup}
         </TextButton>
       </div>
+      {restoreSummary ? (
+        <div className={styles.restorePanel__summary}>
+          <p className={styles.restorePanel__message}>Restore summary</p>
+          <dl className={styles.restorePanel__stats}>
+            <div className={styles.restorePanel__statRow}>
+              <dt className={styles.restorePanel__statLabel}>Processed</dt>
+              <dd className={styles.restorePanel__statValue}>
+                {restoreSummary.backupItemCount}
+              </dd>
+            </div>
+            <div className={styles.restorePanel__statRow}>
+              <dt className={styles.restorePanel__statLabel}>Restored</dt>
+              <dd className={styles.restorePanel__statValue}>
+                {restoreSummary.importedCount}
+              </dd>
+            </div>
+            <div className={styles.restorePanel__statRow}>
+              <dt className={styles.restorePanel__statLabel}>Matched</dt>
+              <dd className={styles.restorePanel__statValue}>
+                {restoreSummary.skippedEqualLocalCount}
+              </dd>
+            </div>
+            <div className={styles.restorePanel__statRow}>
+              <dt className={styles.restorePanel__statLabel}>Newer local</dt>
+              <dd className={styles.restorePanel__statValue}>
+                {restoreSummary.skippedNewerLocalCount}
+              </dd>
+            </div>
+            <div className={styles.restorePanel__statRow}>
+              <dt className={styles.restorePanel__statLabel}>Newer remote</dt>
+              <dd className={styles.restorePanel__statValue}>
+                {restoreSummary.skippedNewerRemoteCount}
+              </dd>
+            </div>
+            <div className={styles.restorePanel__statRow}>
+              <dt className={styles.restorePanel__statLabel}>Reused remote</dt>
+              <dd className={styles.restorePanel__statValue}>
+                {restoreSummary.syncedParityCount}
+              </dd>
+            </div>
+            <div className={styles.restorePanel__statRow}>
+              <dt className={styles.restorePanel__statLabel}>Queued for sync</dt>
+              <dd className={styles.restorePanel__statValue}>
+                {restoreSummary.queuedForSyncCount}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      ) : null}
       {errorMessage ? <p className={styles.restorePanel__error}>{errorMessage}</p> : null}
-      {infoMessage ? <p className={styles.restorePanel__hint}>{infoMessage}</p> : null}
     </section>
   );
 }

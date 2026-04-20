@@ -21,6 +21,8 @@ All notable commit-ready changes to this project should be recorded here.
 - Cleared stale local Supabase sessions automatically when the browser encounters an invalid refresh-token error during session bootstrap.
 - Mirrored rows manually deleted from Supabase as locally trashed items on explicit manual refresh, while protecting unsynced local rows from accidental loss.
 - Synced confirmed permanent deletes from `/trash` to Supabase in the background while hiding deleted items from local lists immediately.
+- Clarified restore results so backup processing reports matched, newer-local, newer-remote, and queued counts instead of a single ambiguous skipped total.
+- Replaced the dense restore-result sentence with a structured summary block in settings so backup processing is easier to scan.
 
 ### Docs
 - Added a non-current `build-spec-v3-import-restore.md` to define the next planned restore milestone.

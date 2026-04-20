@@ -22,9 +22,13 @@ type RestoreBackupSummary = {
 };
 
 export type RestoreBackupResult = {
+  backupItemCount: number;
   importedCount: number;
   queuedForSyncCount: number;
-  skippedCount: number;
+  skippedEqualLocalCount: number;
+  skippedNewerLocalCount: number;
+  skippedNewerRemoteCount: number;
+  syncedParityCount: number;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -166,37 +170,42 @@ export async function restoreAuthenticatedBackup(
   ]);
 
   const localItemsById = new Map(localItems.map((item) => [item.id, item]));
+  const backupItemCount = payload.items.length;
   let importedCount = 0;
   let queuedForSyncCount = 0;
-  let skippedCount = 0;
+  let skippedEqualLocalCount = 0;
+  let skippedNewerLocalCount = 0;
+  let skippedNewerRemoteCount = 0;
+  let syncedParityCount = 0;
 
   for (const backupItem of payload.items) {
     const localItem = localItemsById.get(backupItem.id);
     const remoteItem = remoteItems.get(backupItem.id) ?? null;
 
     if (localItem && backupItem.updatedAt === localItem.updatedAt) {
-      skippedCount += 1;
+      skippedEqualLocalCount += 1;
       continue;
     }
 
     if (localItem && isNewerTimestamp(localItem.updatedAt, backupItem.updatedAt)) {
-      skippedCount += 1;
+      skippedNewerLocalCount += 1;
       continue;
     }
 
     if (remoteItem && isNewerTimestamp(remoteItem.updated_at, backupItem.updatedAt)) {
-      skippedCount += 1;
+      skippedNewerRemoteCount += 1;
       continue;
     }
 
     if (remoteItem && remoteItem.updated_at === backupItem.updatedAt) {
       if (localItem) {
-        skippedCount += 1;
+        skippedEqualLocalCount += 1;
         continue;
       }
 
       await saveItem(mapRemoteRecordToLocalItem(remoteItem));
       importedCount += 1;
+      syncedParityCount += 1;
       continue;
     }
 
@@ -217,8 +226,12 @@ export async function restoreAuthenticatedBackup(
   }
 
   return {
+    backupItemCount,
     importedCount,
     queuedForSyncCount,
-    skippedCount,
+    skippedEqualLocalCount,
+    skippedNewerLocalCount,
+    skippedNewerRemoteCount,
+    syncedParityCount,
   };
 }

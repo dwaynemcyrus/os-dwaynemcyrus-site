@@ -62,6 +62,35 @@
   gap: var(--space-3);
 }
 
+.restorePanel__summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+}
+
+.restorePanel__stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.restorePanel__statRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.restorePanel__statLabel {
+  color: var(--color-muted);
+}
+
+.restorePanel__statValue {
+  margin: 0;
+}
+
 .restorePanel__error {
   line-height: 1.5;
 }
