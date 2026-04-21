@@ -4,6 +4,8 @@ All notable commit-ready changes to this project should be recorded here.
 
 ## Unreleased
 
+## 1.1.0 - 2026-04-21
+
 ### Added
 - Signed-in JSON backup export from canonical Supabase rows with a direct browser download flow.
 - Signed-in password change flow on `/settings` with double-entry confirmation for this single-user app.
