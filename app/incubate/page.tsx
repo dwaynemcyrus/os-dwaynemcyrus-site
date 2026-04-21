@@ -1,22 +1,22 @@
 "use client";
 
 import { AppShell } from "@/components/app-shell/AppShell";
-import { AuthPanel } from "@/components/auth/AuthPanel";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
-import { OpenListButton } from "@/components/navigation/OpenListButton";
-import { OpenProcessButton } from "@/components/navigation/OpenProcessButton";
-import { OpenSettingsButton } from "@/components/navigation/OpenSettingsButton";
-import { OpenTrashButton } from "@/components/navigation/OpenTrashButton";
+import { EmptyState } from "@/components/items/EmptyState";
+import { ItemList } from "@/components/items/ItemList";
+import { BackButton } from "@/components/navigation/BackButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
-import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useAuthSession } from "@/lib/hooks/useAuthSession";
+import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
+import { useItemsByTypes } from "@/lib/hooks/useItemsByTypes";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 
-export default function Home() {
+export default function IncubatePage() {
   const captureDialog = useCaptureDialog();
   const { hasSession } = useAuthSession();
+  const { items, isLoading } = useItemsByTypes(["incubate"]);
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 
@@ -31,8 +31,9 @@ export default function Home() {
         />
       }
       fabLabel={LABELS.capture}
+      headerLeft={<BackButton href="/settings" />}
       onFabPress={captureDialog.openDialog}
-      title="Home"
+      title={LABELS.incubate}
     >
       <SyncStatusBar
         label={label}
@@ -40,15 +41,11 @@ export default function Home() {
         refreshDisabled={isSyncing}
         showRefresh={hasSession}
       />
-      <AuthPanel />
-      {hasSession ? (
-        <>
-          <OpenSettingsButton />
-          <OpenProcessButton />
-          <OpenListButton />
-          <OpenTrashButton />
-        </>
-      ) : null}
+      {isLoading ? null : items.length > 0 ? (
+        <ItemList items={items} />
+      ) : (
+        <EmptyState label={LABELS.emptyIncubateState} />
+      )}
     </AppShell>
   );
 }

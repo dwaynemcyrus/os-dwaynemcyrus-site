@@ -1,4 +1,4 @@
-import type { LocalItem } from "@/lib/items/itemTypes";
+import { normalizeItemType, type LocalItem } from "@/lib/items/itemTypes";
 
 export type RemoteItemRecord = {
   content: string;
@@ -11,7 +11,7 @@ export type RemoteItemRecord = {
   status: LocalItem["status"];
   sync_state: LocalItem["syncState"];
   trashed_at: string | null;
-  type: LocalItem["type"];
+  type: string;
   updated_at: string;
   user_id: string;
 };
@@ -54,7 +54,7 @@ export function mapRemoteRecordToLocalItem(record: RemoteItemRecord): LocalItem 
     syncErrorMessage: null,
     syncState: "synced",
     trashedAt: record.trashed_at,
-    type: record.type,
+    type: normalizeItemType(record.type),
     updatedAt: record.updated_at,
     userId: record.user_id,
   };

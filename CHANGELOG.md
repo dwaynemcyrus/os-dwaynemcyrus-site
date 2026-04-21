@@ -4,6 +4,19 @@ All notable commit-ready changes to this project should be recorded here.
 
 ## Unreleased
 
+### Added
+- Dedicated `/process` route for one-item-at-a-time inbox processing with simplified GTD decisions.
+- New outcome views for `/tasks`, `/notes`, and `/incubate`.
+
+### Changed
+- Promoted `docs/build-specs/build-spec-v4-gtd-processing-wizard.md` to the current build in the build-spec entrypoint.
+- Re-defined inbox processing around `type = 'unknown'` and added `project` plus `incubate` as canonical processed types.
+- Moved the trash navigation entry from `/settings` to the home screen.
+- Moved backup export from the home account panel into `/settings` and restricted the signed-out home screen to auth-only UI.
+
+### Fixed
+- Normalized legacy `someday` data and backups to `incubate` for the new processing model.
+
 ## 1.1.0 - 2026-04-21
 
 ### Added

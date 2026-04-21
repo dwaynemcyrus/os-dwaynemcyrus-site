@@ -1,0 +1,46 @@
+.wizard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+}
+
+.wizard__copy,
+.wizard__field,
+.wizard__branch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.wizard__eyebrow,
+.wizard__label {
+  color: var(--color-muted);
+}
+
+.wizard__message,
+.wizard__question,
+.wizard__error {
+  line-height: 1.5;
+}
+
+.wizard__textarea {
+  min-height: 8rem;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-foreground);
+  resize: vertical;
+}
+
+.wizard__textarea:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.wizard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

@@ -4,10 +4,24 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Active
 
+- None currently.
+
 ## Backlog
 - None currently.
 
 ## Completed
+
+### 2026-04-21 — Settings export and gated home nav
+- Status: completed
+- Summary: moved backup export from the home auth panel into `/settings`, added a dedicated home settings button, and restricted the signed-out home screen to auth-only UI.
+
+### 2026-04-21 — Home trash navigation
+- Status: completed
+- Summary: moved the trash navigation entry from `/settings` to the home screen alongside the main inbox and process navigation.
+
+### 2026-04-21 — V4 GTD processing wizard
+- Status: completed
+- Summary: added the type-driven inbox processing wizard, new `/process`, `/tasks`, `/notes`, and `/incubate` routes, migrated `someday` to `incubate`, and extended sync plus backup compatibility for the new processing model.
 
 ### 2026-04-18 — Documentation structure alignment
 - Status: completed

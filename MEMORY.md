@@ -136,6 +136,18 @@ future sessions do not need to rediscover them.
   - `lib/backup/restoreBackup.ts`
   - `lib/sync/syncEngine.ts`
 
+### Inbox state is encoded by `type = unknown`
+- Status: active
+- First seen: 2026-04-21
+- Last seen: 2026-04-21
+- Symptom: it is easy to reach for extra GTD state columns even though the current processing model is intentionally type-driven.
+- Root cause: the app started as a narrow capture surface, so processing semantics have to be layered onto the existing item model rather than a new workflow schema.
+- Resolution: treat `type = 'unknown'` as inbox/unprocessed, mutate `type` to the processed destination, and normalize legacy `someday` values to `incubate`.
+- Prevention: do not introduce parallel processing fields like `gtd_outcome` or `processing_state` unless the product deliberately moves to a richer workflow model later.
+- References:
+  - `docs/build-specs/build-spec-v4-gtd-processing-wizard.md`
+  - `lib/items/itemTypes.ts`
+
 ### Remote deletions should reconcile only on explicit manual refresh
 - Status: active
 - First seen: 2026-04-20

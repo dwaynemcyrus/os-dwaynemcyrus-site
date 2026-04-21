@@ -1,5 +1,6 @@
 import {
   BACKUP_REMOTE_COLUMNS,
+  LEGACY_PSA_BACKUP_FORMAT,
   PSA_BACKUP_FORMAT,
   type BackupItem,
   type BackupPayload,
@@ -10,7 +11,7 @@ import {
   mapRemoteRecordToLocalItem,
   type RemoteItemRecord,
 } from "@/lib/items/itemMappers";
-import type { LocalItem } from "@/lib/items/itemTypes";
+import { normalizeItemType, type LocalItem } from "@/lib/items/itemTypes";
 import { getAuthenticatedUserId } from "@/lib/supabase/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { runSyncQueue } from "@/lib/sync/syncQueue";
@@ -75,7 +76,8 @@ function isBackupPayload(value: unknown): value is BackupPayload {
   }
 
   return (
-    value.format === PSA_BACKUP_FORMAT &&
+    (value.format === PSA_BACKUP_FORMAT ||
+      value.format === LEGACY_PSA_BACKUP_FORMAT) &&
     value.source === "supabase" &&
     isString(value.exportedAt) &&
     isString(value.userId) &&
@@ -108,7 +110,7 @@ function mapBackupItemToPendingLocalItem(
     syncErrorMessage: null,
     syncState: "pending_sync",
     trashedAt: item.trashedAt,
-    type: item.type,
+    type: normalizeItemType(item.type),
     updatedAt: item.updatedAt,
     userId,
   };

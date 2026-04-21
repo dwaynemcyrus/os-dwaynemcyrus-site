@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TextButton } from "@/components/primitives/TextButton";
 import { LABELS } from "@/lib/constants/labels";
+import { exportAuthenticatedBackup } from "@/lib/export/exportBackup";
 import { useAuthSession } from "@/lib/hooks/useAuthSession";
 import { updateCurrentUserPassword } from "@/lib/supabase/auth";
 import styles from "./SettingsPanel.module.css";
@@ -11,7 +12,10 @@ export function SettingsPanel() {
   const { hasSession, isLoading, user } = useAuthSession();
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [exportErrorMessage, setExportErrorMessage] = useState("");
+  const [exportInfoMessage, setExportInfoMessage] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -21,6 +25,34 @@ export function SettingsPanel() {
     isSubmitting ||
     password.length < 8 ||
     confirmPassword.length < 8;
+
+  async function handleExportBackup() {
+    if (!hasSession) {
+      setExportErrorMessage("Sign in before exporting your backup.");
+      setExportInfoMessage("");
+      return;
+    }
+
+    setExportErrorMessage("");
+    setExportInfoMessage("");
+    setIsExporting(true);
+
+    try {
+      const result = await exportAuthenticatedBackup();
+      const itemLabel = result.itemCount === 1 ? "item" : "items";
+
+      setExportInfoMessage(
+        `Downloaded ${result.filename} with ${result.itemCount} ${itemLabel}.`,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not export your backup.";
+
+      setExportErrorMessage(message);
+    } finally {
+      setIsExporting(false);
+    }
+  }
 
   async function handleChangePassword() {
     if (!hasSession) {
@@ -60,8 +92,8 @@ export function SettingsPanel() {
         <p className={styles.settingsPanel__eyebrow}>Settings</p>
         <p className={styles.settingsPanel__message}>
           {hasSession && user
-            ? `Signed in as ${user.email}. Change your password here.`
-            : "Sign in on the home screen before changing your password."}
+            ? `Signed in as ${user.email}. Manage your account and backups here.`
+            : "Sign in on the home screen before changing your password or exporting a backup."}
         </p>
         <p className={styles.settingsPanel__hint}>
           If you are locked out completely, recovery is manual through Supabase.
@@ -103,14 +135,44 @@ export function SettingsPanel() {
       {infoMessage ? <p className={styles.settingsPanel__hint}>{infoMessage}</p> : null}
       <div className={styles.settingsPanel__section}>
         <div className={styles.settingsPanel__copy}>
-          <p className={styles.settingsPanel__eyebrow}>{LABELS.trash}</p>
+          <p className={styles.settingsPanel__eyebrow}>{LABELS.exportBackup}</p>
           <p className={styles.settingsPanel__message}>
-            Review trashed items before deciding whether to delete them permanently.
+            Download the canonical Supabase backup for your signed-in account.
           </p>
         </div>
         <div className={styles.settingsPanel__list}>
-          <TextButton href="/trash" variant="secondary">
-            {LABELS.openTrash}
+          <TextButton
+            disabled={isLoading || isExporting || !hasSession}
+            onPress={() => {
+              void handleExportBackup();
+            }}
+          >
+            {isExporting ? LABELS.exportingBackup : LABELS.exportBackup}
+          </TextButton>
+        </div>
+        {exportErrorMessage ? (
+          <p className={styles.settingsPanel__error}>{exportErrorMessage}</p>
+        ) : null}
+        {exportInfoMessage ? (
+          <p className={styles.settingsPanel__hint}>{exportInfoMessage}</p>
+        ) : null}
+      </div>
+      <div className={styles.settingsPanel__section}>
+        <div className={styles.settingsPanel__copy}>
+          <p className={styles.settingsPanel__eyebrow}>Views</p>
+          <p className={styles.settingsPanel__message}>
+            Review processed items by destination after they leave the inbox.
+          </p>
+        </div>
+        <div className={styles.settingsPanel__list}>
+          <TextButton href="/tasks" variant="secondary">
+            {LABELS.openTasks}
+          </TextButton>
+          <TextButton href="/notes" variant="secondary">
+            {LABELS.openNotes}
+          </TextButton>
+          <TextButton href="/incubate" variant="secondary">
+            {LABELS.openIncubate}
           </TextButton>
         </div>
       </div>

@@ -1,6 +1,10 @@
 import type { ItemStatus, ItemType, SyncState } from "@/lib/items/itemTypes";
 
-export const PSA_BACKUP_FORMAT = "psa-backup.v1";
+export const LEGACY_PSA_BACKUP_FORMAT = "psa-backup.v1";
+export const PSA_BACKUP_FORMAT = "psa-backup.v2";
+export type BackupFormat =
+  | typeof LEGACY_PSA_BACKUP_FORMAT
+  | typeof PSA_BACKUP_FORMAT;
 export const BACKUP_REMOTE_COLUMNS = [
   "id",
   "user_id",
@@ -28,14 +32,14 @@ export type BackupItem = {
   status: ItemStatus;
   syncState: SyncState;
   trashedAt: string | null;
-  type: ItemType;
+  type: ItemType | "someday";
   updatedAt: string;
   userId: string;
 };
 
 export type BackupPayload = {
   exportedAt: string;
-  format: typeof PSA_BACKUP_FORMAT;
+  format: BackupFormat;
   items: BackupItem[];
   source: "supabase";
   userId: string;

@@ -1,22 +1,22 @@
 "use client";
 
 import { AppShell } from "@/components/app-shell/AppShell";
-import { AuthPanel } from "@/components/auth/AuthPanel";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
-import { OpenListButton } from "@/components/navigation/OpenListButton";
-import { OpenProcessButton } from "@/components/navigation/OpenProcessButton";
-import { OpenSettingsButton } from "@/components/navigation/OpenSettingsButton";
-import { OpenTrashButton } from "@/components/navigation/OpenTrashButton";
+import { BackButton } from "@/components/navigation/BackButton";
+import { ProcessProgress } from "@/components/processing/ProcessProgress";
+import { ProcessWizard } from "@/components/processing/ProcessWizard";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
-import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useAuthSession } from "@/lib/hooks/useAuthSession";
+import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
+import { useProcessingItems } from "@/lib/hooks/useProcessingItems";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 
-export default function Home() {
+export default function ProcessPage() {
   const captureDialog = useCaptureDialog();
   const { hasSession } = useAuthSession();
+  const { isLoading, items } = useProcessingItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 
@@ -31,8 +31,9 @@ export default function Home() {
         />
       }
       fabLabel={LABELS.capture}
+      headerLeft={<BackButton />}
       onFabPress={captureDialog.openDialog}
-      title="Home"
+      title={LABELS.processInbox}
     >
       <SyncStatusBar
         label={label}
@@ -40,15 +41,12 @@ export default function Home() {
         refreshDisabled={isSyncing}
         showRefresh={hasSession}
       />
-      <AuthPanel />
-      {hasSession ? (
-        <>
-          <OpenSettingsButton />
-          <OpenProcessButton />
-          <OpenListButton />
-          <OpenTrashButton />
-        </>
-      ) : null}
+      <ProcessProgress remainingCount={items.length} />
+      <ProcessWizard
+        isLoading={isLoading}
+        item={items[0] ?? null}
+        key={items[0]?.id ?? "empty"}
+      />
     </AppShell>
   );
 }

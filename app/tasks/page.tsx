@@ -1,6 +1,5 @@
 "use client";
 
-import { useTransition } from "react";
 import { AppShell } from "@/components/app-shell/AppShell";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { EmptyState } from "@/components/items/EmptyState";
@@ -10,18 +9,18 @@ import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
 import { useAuthSession } from "@/lib/hooks/useAuthSession";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
-import { useItems } from "@/lib/hooks/useItems";
-import { useRetrySync } from "@/lib/hooks/useRetrySync";
+import { useItemsByTypes } from "@/lib/hooks/useItemsByTypes";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
-import { trashItem } from "@/lib/items/itemCommands";
+import { useRetrySync } from "@/lib/hooks/useRetrySync";
 
-export default function ListPage() {
+export default function TasksPage() {
   const captureDialog = useCaptureDialog();
   const { hasSession } = useAuthSession();
-  const { isLoading, items, refreshItems } = useItems();
+  const { items, isLoading } = useItemsByTypes(["task", "project"]);
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
-  const [, startTransition] = useTransition();
+  const nextActionItems = items.filter((item) => item.type === "task");
+  const projectItems = items.filter((item) => item.type === "project");
 
   useRetrySync();
 
@@ -29,15 +28,14 @@ export default function ListPage() {
     <AppShell
       dialogSlot={
         <CaptureDialog
-          onCaptured={refreshItems}
           onOpenChange={captureDialog.setOpen}
           open={captureDialog.open}
         />
       }
       fabLabel={LABELS.capture}
-      headerLeft={<BackButton />}
+      headerLeft={<BackButton href="/settings" />}
       onFabPress={captureDialog.openDialog}
-      title="Inbox"
+      title={LABELS.tasks}
     >
       <SyncStatusBar
         label={label}
@@ -46,17 +44,22 @@ export default function ListPage() {
         showRefresh={hasSession}
       />
       {isLoading ? null : items.length > 0 ? (
-        <ItemList
-          items={items}
-          onTrash={async (id) => {
-            await trashItem(id);
-            startTransition(() => {
-              void refreshItems();
-            });
-          }}
-        />
+        <>
+          {nextActionItems.length > 0 ? (
+            <>
+              <p>Next Actions</p>
+              <ItemList items={nextActionItems} />
+            </>
+          ) : null}
+          {projectItems.length > 0 ? (
+            <>
+              <p>Projects</p>
+              <ItemList items={projectItems} />
+            </>
+          ) : null}
+        </>
       ) : (
-        <EmptyState label={LABELS.emptyInboxState} />
+        <EmptyState label={LABELS.emptyTasksState} />
       )}
     </AppShell>
   );

@@ -27,6 +27,7 @@ export type SyncRunReason =
   | "delete"
   | "foreground"
   | "manual"
+  | "process"
   | "reconnect"
   | "restore"
   | "retry"

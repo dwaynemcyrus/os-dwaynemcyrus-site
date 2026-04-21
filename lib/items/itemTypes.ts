@@ -5,10 +5,11 @@ export const LOCAL_USER_ID = "local-user";
 
 export type ItemType =
   | "content"
+  | "incubate"
   | "idea"
   | "journal"
+  | "project"
   | "reference"
-  | "someday"
   | "task"
   | "unknown";
 
@@ -39,3 +40,21 @@ export type LocalItem = {
 export type CreateLocalItemInput = {
   content: string;
 };
+
+export function normalizeItemType(value: string): ItemType {
+  switch (value) {
+    case "content":
+    case "idea":
+    case "incubate":
+    case "journal":
+    case "project":
+    case "reference":
+    case "task":
+    case "unknown":
+      return value;
+    case "someday":
+      return "incubate";
+    default:
+      return "unknown";
+  }
+}

@@ -5,6 +5,7 @@ import {
   type BackupPayload,
 } from "@/lib/backup/backupTypes";
 import type { RemoteItemRecord } from "@/lib/items/itemMappers";
+import { normalizeItemType } from "@/lib/items/itemTypes";
 import { getAuthenticatedUserId } from "@/lib/supabase/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -26,7 +27,7 @@ function mapRemoteRecordToExportItem(record: RemoteItemRecord): BackupItem {
     status: record.status,
     syncState: record.sync_state,
     trashedAt: record.trashed_at,
-    type: record.type,
+    type: normalizeItemType(record.type),
     updatedAt: record.updated_at,
     userId: record.user_id,
   };
