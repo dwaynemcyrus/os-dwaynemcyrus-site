@@ -13,10 +13,10 @@ import { useItemsByTypes } from "@/lib/hooks/useItemsByTypes";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 
-export default function TasksPage() {
+export default function ProjectsPage() {
   const captureDialog = useCaptureDialog();
   const { hasSession } = useAuthSession();
-  const { items, isLoading } = useItemsByTypes(["task"]);
+  const { items, isLoading } = useItemsByTypes(["project"]);
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 
@@ -33,7 +33,7 @@ export default function TasksPage() {
       fabLabel={LABELS.capture}
       headerLeft={<BackButton />}
       onFabPress={captureDialog.openDialog}
-      title={LABELS.tasks}
+      title={LABELS.projects}
     >
       <SyncStatusBar
         label={label}
@@ -44,7 +44,7 @@ export default function TasksPage() {
       {isLoading ? null : items.length > 0 ? (
         <ItemList items={items} />
       ) : (
-        <EmptyState label={LABELS.emptyTasksState} />
+        <EmptyState label={LABELS.emptyProjectsState} />
       )}
     </AppShell>
   );

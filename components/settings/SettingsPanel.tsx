@@ -165,9 +165,6 @@ export function SettingsPanel() {
           </p>
         </div>
         <div className={styles.settingsPanel__list}>
-          <TextButton href="/tasks" variant="secondary">
-            {LABELS.openTasks}
-          </TextButton>
           <TextButton href="/notes" variant="secondary">
             {LABELS.openNotes}
           </TextButton>

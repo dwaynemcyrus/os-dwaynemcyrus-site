@@ -4,8 +4,10 @@ import { AppShell } from "@/components/app-shell/AppShell";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { OpenListButton } from "@/components/navigation/OpenListButton";
+import { OpenProjectsButton } from "@/components/navigation/OpenProjectsButton";
 import { OpenProcessButton } from "@/components/navigation/OpenProcessButton";
 import { OpenSettingsButton } from "@/components/navigation/OpenSettingsButton";
+import { OpenTasksButton } from "@/components/navigation/OpenTasksButton";
 import { OpenTrashButton } from "@/components/navigation/OpenTrashButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
@@ -46,6 +48,8 @@ export default function Home() {
           <OpenSettingsButton />
           <OpenProcessButton />
           <OpenListButton />
+          <OpenTasksButton />
+          <OpenProjectsButton />
           <OpenTrashButton />
         </>
       ) : null}

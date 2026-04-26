@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-26 — V5 tasks and projects destination views
+- Status: completed
+- Summary: activated a new v5 build spec for split task/project destination views, made `/tasks` task-only, added `/projects`, promoted both destinations to the signed-in home screen, and removed task/project destination entry from Settings.
+
 ### 2026-04-26 — Processing wizard review and bug fixes
 - Status: completed
 - Summary: fixed back button navigation on destination views (tasks/notes/incubate) returning to `/settings` instead of `/`; fixed wizard back button to step back through the correct step sequence; removed the direct trash bypass from the inbox list view; moved hardcoded UI strings into LABELS.
