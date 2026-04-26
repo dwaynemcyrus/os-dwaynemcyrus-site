@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell/AppShell";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
@@ -17,12 +19,23 @@ import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 
 export default function Home() {
+  const router = useRouter();
   const captureDialog = useCaptureDialog();
-  const { hasSession } = useAuthSession();
+  const { hasSession, isLoading } = useAuthSession();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 
   useRetrySync();
+
+  useEffect(() => {
+    if (!isLoading && !hasSession) {
+      router.replace("/login");
+    }
+  }, [isLoading, hasSession, router]);
+
+  if (isLoading || !hasSession) {
+    return null;
+  }
 
   return (
     <AppShell
@@ -43,16 +56,12 @@ export default function Home() {
         showRefresh={hasSession}
       />
       <AuthPanel />
-      {hasSession ? (
-        <>
-          <OpenSettingsButton />
-          <OpenProcessButton />
-          <OpenListButton />
-          <OpenTasksButton />
-          <OpenProjectsButton />
-          <OpenTrashButton />
-        </>
-      ) : null}
+      <OpenSettingsButton />
+      <OpenProcessButton />
+      <OpenListButton />
+      <OpenTasksButton />
+      <OpenProjectsButton />
+      <OpenTrashButton />
     </AppShell>
   );
 }

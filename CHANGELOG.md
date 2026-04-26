@@ -5,6 +5,7 @@ All notable commit-ready changes to this project should be recorded here.
 ## Unreleased
 
 ### Added
+- Dedicated `/login` route with a standalone sign-in form, no app chrome, and post-auth redirect to home.
 - Dedicated `/process` route for one-item-at-a-time inbox processing with simplified GTD decisions.
 - New outcome views for `/tasks`, `/notes`, and `/incubate`.
 - Session-scoped rapid capture toggle in the shared capture dialog for repeated local saves without closing the modal.
@@ -25,6 +26,8 @@ All notable commit-ready changes to this project should be recorded here.
 - Fixed the processing wizard back button to return to the previous step rather than always resetting to clarify.
 - Removed the direct trash shortcut from the inbox list view so all inbox items must be routed through the processing wizard.
 - Moved hardcoded `"Inbox"`, `"Next Actions"`, and `"Projects"` strings into `LABELS`.
+- Eliminated the sign-in form flash on load for authenticated users by gating the home page on auth resolution before rendering.
+- Eliminated app chrome and FAB visibility for unauthenticated users by redirecting unresolved or signed-out sessions from `/` to `/login`.
 
 ## 1.1.0 - 2026-04-21
 
