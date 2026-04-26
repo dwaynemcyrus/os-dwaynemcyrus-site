@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-26 — Rapid capture toggle
+- Status: completed
+- Summary: added a session-scoped rapid capture toggle to the shared capture dialog so repeated captures can stay in the modal, clear the textarea, and refocus immediately after each local save.
+
 ### 2026-04-21 — Settings export and gated home nav
 - Status: completed
 - Summary: moved backup export from the home auth panel into `/settings`, added a dedicated home settings button, and restricted the signed-out home screen to auth-only UI.

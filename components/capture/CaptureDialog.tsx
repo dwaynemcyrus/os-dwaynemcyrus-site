@@ -1,6 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { useState } from "react";
 import { CaptureForm } from "./CaptureForm";
 import styles from "./CaptureDialog.module.css";
 
@@ -15,8 +16,18 @@ export function CaptureDialog({
   onOpenChange,
   open,
 }: CaptureDialogProps) {
+  const [rapidCapture, setRapidCapture] = useState(false);
+
+  function handleOpenChange(nextOpen: boolean) {
+    onOpenChange(nextOpen);
+
+    if (!nextOpen) {
+      setRapidCapture(false);
+    }
+  }
+
   return (
-    <Dialog.Root onOpenChange={onOpenChange} open={open}>
+    <Dialog.Root onOpenChange={handleOpenChange} open={open}>
       <Dialog.Portal>
         <Dialog.Overlay className={styles.captureDialog__overlay} />
         <Dialog.Content className={styles.captureDialog__content}>
@@ -27,10 +38,10 @@ export function CaptureDialog({
             Capture a thought immediately. Local save happens before background sync.
           </Dialog.Description>
           <CaptureForm
-            onSubmitted={async () => {
-              await onCaptured?.();
-              onOpenChange(false);
-            }}
+            onCloseRequested={() => handleOpenChange(false)}
+            onRapidCaptureChange={setRapidCapture}
+            onSubmitted={onCaptured}
+            rapidCapture={rapidCapture}
           />
         </Dialog.Content>
       </Dialog.Portal>

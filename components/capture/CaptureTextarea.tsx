@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from "react";
 import styles from "./CaptureTextarea.module.css";
 
 type CaptureTextareaProps = {
@@ -7,15 +8,18 @@ type CaptureTextareaProps = {
   value: string;
 };
 
-export function CaptureTextarea({ onChange, value }: CaptureTextareaProps) {
-  return (
-    <textarea
-      autoFocus
-      className={styles.captureTextarea}
-      onChange={(event) => onChange(event.target.value)}
-      placeholder="Write it down."
-      rows={6}
-      value={value}
-    />
-  );
-}
+export const CaptureTextarea = forwardRef<HTMLTextAreaElement, CaptureTextareaProps>(
+  function CaptureTextarea({ onChange, value }, ref) {
+    return (
+      <textarea
+        autoFocus
+        className={styles.captureTextarea}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="Write it down."
+        ref={ref}
+        rows={6}
+        value={value}
+      />
+    );
+  },
+);

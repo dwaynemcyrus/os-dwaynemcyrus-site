@@ -7,6 +7,7 @@ All notable commit-ready changes to this project should be recorded here.
 ### Added
 - Dedicated `/process` route for one-item-at-a-time inbox processing with simplified GTD decisions.
 - New outcome views for `/tasks`, `/notes`, and `/incubate`.
+- Session-scoped rapid capture toggle in the shared capture dialog for repeated local saves without closing the modal.
 
 ### Changed
 - Promoted `docs/build-specs/build-spec-v4-gtd-processing-wizard.md` to the current build in the build-spec entrypoint.

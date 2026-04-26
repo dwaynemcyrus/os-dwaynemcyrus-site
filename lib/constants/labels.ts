@@ -31,6 +31,7 @@ export const LABELS = {
   openTrash: "Open Trash",
   processInbox: "Process Inbox",
   project: "Project",
+  rapidCapture: "Rapid capture",
   refreshSync: "Refresh sync",
   restoreBackup: "Restore backup",
   save: "Save",
