@@ -33,7 +33,7 @@ export default function TasksPage() {
         />
       }
       fabLabel={LABELS.capture}
-      headerLeft={<BackButton href="/settings" />}
+      headerLeft={<BackButton />}
       onFabPress={captureDialog.openDialog}
       title={LABELS.tasks}
     >
@@ -47,13 +47,13 @@ export default function TasksPage() {
         <>
           {nextActionItems.length > 0 ? (
             <>
-              <p>Next Actions</p>
+              <p>{LABELS.nextActions}</p>
               <ItemList items={nextActionItems} />
             </>
           ) : null}
           {projectItems.length > 0 ? (
             <>
-              <p>Projects</p>
+              <p>{LABELS.projects}</p>
               <ItemList items={projectItems} />
             </>
           ) : null}

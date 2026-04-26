@@ -12,6 +12,12 @@ import styles from "./ProcessWizard.module.css";
 
 type WizardStep = "actionability" | "clarify" | "actionable" | "non-actionable";
 
+const PREVIOUS_STEP: Partial<Record<WizardStep, WizardStep>> = {
+  actionability: "clarify",
+  actionable: "actionability",
+  "non-actionable": "actionability",
+};
+
 type ProcessWizardProps = {
   errorMessage?: string;
   isLoading: boolean;
@@ -208,7 +214,7 @@ export function ProcessWizard({
           <TextButton
             disabled={isSubmitting}
             onPress={() => {
-              setStep("clarify");
+              setStep(PREVIOUS_STEP[step] ?? "clarify");
             }}
             variant="ghost"
           >

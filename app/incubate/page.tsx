@@ -31,7 +31,7 @@ export default function IncubatePage() {
         />
       }
       fabLabel={LABELS.capture}
-      headerLeft={<BackButton href="/settings" />}
+      headerLeft={<BackButton />}
       onFabPress={captureDialog.openDialog}
       title={LABELS.incubate}
     >

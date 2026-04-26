@@ -31,7 +31,7 @@ export default function NotesPage() {
         />
       }
       fabLabel={LABELS.capture}
-      headerLeft={<BackButton href="/settings" />}
+      headerLeft={<BackButton />}
       onFabPress={captureDialog.openDialog}
       title={LABELS.notes}
     >

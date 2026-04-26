@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-26 — Processing wizard review and bug fixes
+- Status: completed
+- Summary: fixed back button navigation on destination views (tasks/notes/incubate) returning to `/settings` instead of `/`; fixed wizard back button to step back through the correct step sequence; removed the direct trash bypass from the inbox list view; moved hardcoded UI strings into LABELS.
+
 ### 2026-04-26 — Inbox processing wizard hardening
 - Status: completed
 - Summary: hardened `/process` with an explicit decision-submit lock, resilient inbox load/retry handling, and progress visibility that no longer contradicts blocking loading or error states.

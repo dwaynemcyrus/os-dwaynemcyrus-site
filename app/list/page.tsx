@@ -1,6 +1,5 @@
 "use client";
 
-import { useTransition } from "react";
 import { AppShell } from "@/components/app-shell/AppShell";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { EmptyState } from "@/components/items/EmptyState";
@@ -13,7 +12,6 @@ import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useItems } from "@/lib/hooks/useItems";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
-import { trashItem } from "@/lib/items/itemCommands";
 
 export default function ListPage() {
   const captureDialog = useCaptureDialog();
@@ -21,7 +19,6 @@ export default function ListPage() {
   const { isLoading, items, refreshItems } = useItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
-  const [, startTransition] = useTransition();
 
   useRetrySync();
 
@@ -37,7 +34,7 @@ export default function ListPage() {
       fabLabel={LABELS.capture}
       headerLeft={<BackButton />}
       onFabPress={captureDialog.openDialog}
-      title="Inbox"
+      title={LABELS.inbox}
     >
       <SyncStatusBar
         label={label}
@@ -46,15 +43,7 @@ export default function ListPage() {
         showRefresh={hasSession}
       />
       {isLoading ? null : items.length > 0 ? (
-        <ItemList
-          items={items}
-          onTrash={async (id) => {
-            await trashItem(id);
-            startTransition(() => {
-              void refreshItems();
-            });
-          }}
-        />
+        <ItemList items={items} />
       ) : (
         <EmptyState label={LABELS.emptyInboxState} />
       )}
