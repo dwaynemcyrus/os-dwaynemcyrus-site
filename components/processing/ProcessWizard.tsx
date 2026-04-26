@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { TextButton } from "@/components/primitives/TextButton";
 import { LABELS } from "@/lib/constants/labels";
 import {
@@ -13,21 +13,46 @@ import styles from "./ProcessWizard.module.css";
 type WizardStep = "actionability" | "clarify" | "actionable" | "non-actionable";
 
 type ProcessWizardProps = {
+  errorMessage?: string;
   isLoading: boolean;
   item: LocalItem | null;
+  onRetryLoad?: () => void;
 };
 
-export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
+export function ProcessWizard({
+  errorMessage = "",
+  isLoading,
+  item,
+  onRetryLoad,
+}: ProcessWizardProps) {
   const [content, setContent] = useState(item?.content ?? "");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [submitErrorMessage, setSubmitErrorMessage] = useState("");
   const [step, setStep] = useState<WizardStep>("clarify");
-  const [isSubmitting, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isLoading) {
     return (
       <section className={styles.wizard}>
         <p className={styles.wizard__eyebrow}>{LABELS.processInbox}</p>
         <p className={styles.wizard__message}>Loading inbox…</p>
+      </section>
+    );
+  }
+
+  if (errorMessage && !item) {
+    return (
+      <section className={styles.wizard}>
+        <p className={styles.wizard__eyebrow}>{LABELS.processInbox}</p>
+        <p className={styles.wizard__error}>{errorMessage}</p>
+        {onRetryLoad ? (
+          <div className={styles.wizard__actions}>
+            <TextButton
+              onPress={onRetryLoad}
+            >
+              {LABELS.retry}
+            </TextButton>
+          </div>
+        ) : null}
       </section>
     );
   }
@@ -41,25 +66,28 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
     );
   }
 
-  function handleDecision(decision: ProcessingDecision) {
-    if (!item) {
+  async function handleDecision(decision: ProcessingDecision) {
+    if (!item || isSubmitting) {
       return;
     }
 
-    setErrorMessage("");
+    setSubmitErrorMessage("");
+    setIsSubmitting(true);
 
-    startTransition(() => {
-      void processInboxItem({
+    try {
+      await processInboxItem({
         content,
         decision,
         id: item.id,
-      }).catch((error) => {
-        const message =
-          error instanceof Error ? error.message : "Could not process the item.";
-
-        setErrorMessage(message);
       });
-    });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not process the item.";
+
+      setSubmitErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -76,6 +104,7 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
         </label>
         <textarea
           className={styles.wizard__textarea}
+          disabled={isSubmitting}
           id="process-content"
           onChange={(event) => setContent(event.target.value)}
           value={content}
@@ -98,17 +127,17 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
           <p className={styles.wizard__question}>Is it actionable?</p>
           <div className={styles.wizard__actions}>
             <TextButton
-              disabled={isSubmitting}
-              onPress={() => {
-                setStep("actionable");
+            disabled={isSubmitting}
+            onPress={() => {
+              setStep("actionable");
               }}
             >
               Yes
             </TextButton>
             <TextButton
-              disabled={isSubmitting}
-              onPress={() => {
-                setStep("non-actionable");
+            disabled={isSubmitting}
+            onPress={() => {
+              setStep("non-actionable");
               }}
               variant="secondary"
             >
@@ -124,7 +153,7 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
             <TextButton
               disabled={isSubmitting}
               onPress={() => {
-                handleDecision("task");
+                void handleDecision("task");
               }}
             >
               {LABELS.nextAction}
@@ -132,7 +161,7 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
             <TextButton
               disabled={isSubmitting}
               onPress={() => {
-                handleDecision("project");
+                void handleDecision("project");
               }}
               variant="secondary"
             >
@@ -148,7 +177,7 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
             <TextButton
               disabled={isSubmitting}
               onPress={() => {
-                handleDecision("reference");
+                void handleDecision("reference");
               }}
             >
               {LABELS.notes}
@@ -156,7 +185,7 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
             <TextButton
               disabled={isSubmitting}
               onPress={() => {
-                handleDecision("incubate");
+                void handleDecision("incubate");
               }}
               variant="secondary"
             >
@@ -165,7 +194,7 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
             <TextButton
               disabled={isSubmitting}
               onPress={() => {
-                handleDecision("trash");
+                void handleDecision("trash");
               }}
               variant="danger"
             >
@@ -187,7 +216,21 @@ export function ProcessWizard({ isLoading, item }: ProcessWizardProps) {
           </TextButton>
         </div>
       ) : null}
-      {errorMessage ? <p className={styles.wizard__error}>{errorMessage}</p> : null}
+      {errorMessage ? (
+        <>
+          <p className={styles.wizard__error}>{errorMessage}</p>
+          {onRetryLoad ? (
+            <div className={styles.wizard__actions}>
+              <TextButton disabled={isSubmitting} onPress={onRetryLoad}>
+                {LABELS.retry}
+              </TextButton>
+            </div>
+          ) : null}
+        </>
+      ) : null}
+      {submitErrorMessage ? (
+        <p className={styles.wizard__error}>{submitErrorMessage}</p>
+      ) : null}
     </section>
   );
 }

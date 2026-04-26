@@ -16,9 +16,11 @@ import { useRetrySync } from "@/lib/hooks/useRetrySync";
 export default function ProcessPage() {
   const captureDialog = useCaptureDialog();
   const { hasSession } = useAuthSession();
-  const { isLoading, items } = useProcessingItems();
+  const { errorMessage, isLoading, items, refreshItems } = useProcessingItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
+  const currentItem = items[0] ?? null;
+  const showProgress = !isLoading && !(errorMessage && !currentItem);
 
   useRetrySync();
 
@@ -41,11 +43,15 @@ export default function ProcessPage() {
         refreshDisabled={isSyncing}
         showRefresh={hasSession}
       />
-      <ProcessProgress remainingCount={items.length} />
+      {showProgress ? <ProcessProgress remainingCount={items.length} /> : null}
       <ProcessWizard
+        errorMessage={errorMessage}
         isLoading={isLoading}
-        item={items[0] ?? null}
-        key={items[0]?.id ?? "empty"}
+        item={currentItem}
+        key={currentItem?.id ?? "empty"}
+        onRetryLoad={() => {
+          void refreshItems();
+        }}
       />
     </AppShell>
   );

@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-26 — Inbox processing wizard hardening
+- Status: completed
+- Summary: hardened `/process` with an explicit decision-submit lock, resilient inbox load/retry handling, and progress visibility that no longer contradicts blocking loading or error states.
+
 ### 2026-04-26 — Rapid capture toggle
 - Status: completed
 - Summary: added a session-scoped rapid capture toggle to the shared capture dialog so repeated captures can stay in the modal, clear the textarea, and refocus immediately after each local save.

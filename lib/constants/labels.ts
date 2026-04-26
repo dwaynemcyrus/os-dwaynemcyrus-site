@@ -33,6 +33,7 @@ export const LABELS = {
   project: "Project",
   rapidCapture: "Rapid capture",
   refreshSync: "Refresh sync",
+  retry: "Retry",
   restoreBackup: "Restore backup",
   save: "Save",
   signIn: "Sign in",

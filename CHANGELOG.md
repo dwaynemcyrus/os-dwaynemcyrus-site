@@ -17,6 +17,7 @@ All notable commit-ready changes to this project should be recorded here.
 
 ### Fixed
 - Normalized legacy `someday` data and backups to `incubate` for the new processing model.
+- Hardened the inbox processing wizard against duplicate decision taps, blocking load hangs, and misleading progress messaging during inbox loading failures.
 
 ## 1.1.0 - 2026-04-21
 
