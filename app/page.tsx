@@ -1,7 +1,6 @@
 "use client";
 
 import { AppShell } from "@/components/app-shell/AppShell";
-import { AuthPanel } from "@/components/auth/AuthPanel";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { OpenListButton } from "@/components/navigation/OpenListButton";
 import { OpenProjectsButton } from "@/components/navigation/OpenProjectsButton";
@@ -46,7 +45,6 @@ export default function Home() {
         refreshDisabled={isSyncing}
         showRefresh={hasSession}
       />
-      <AuthPanel />
       <OpenSettingsButton />
       <OpenProcessButton />
       <OpenListButton />

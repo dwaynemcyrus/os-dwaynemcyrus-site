@@ -3,6 +3,7 @@
 import { AppShell } from "@/components/app-shell/AppShell";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { BackButton } from "@/components/navigation/BackButton";
+import { AuthPanel } from "@/components/auth/AuthPanel";
 import { RestoreBackupPanel } from "@/components/settings/RestoreBackupPanel";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
 import { LABELS } from "@/lib/constants/labels";
@@ -30,6 +31,7 @@ export default function SettingsPage() {
       onFabPress={captureDialog.openDialog}
       title={LABELS.settings}
     >
+      <AuthPanel />
       <SettingsPanel />
       <RestoreBackupPanel />
     </AppShell>
