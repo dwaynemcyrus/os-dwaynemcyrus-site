@@ -72,6 +72,18 @@ future sessions do not need to rediscover them.
 
 ## UI / UX
 
+### Rapid capture on iPhone should not rely on async refocus after tapping Save
+- Status: active
+- First seen: 2026-04-27
+- Last seen: 2026-04-27
+- Symptom: in rapid capture mode, tapping `Save` on iPhone can dismiss the keyboard and leave the textarea unfocused even though the app tries to refocus it after saving.
+- Root cause: iPhone Safari is unreliable about reopening the virtual keyboard from a programmatic focus call after an awaited save triggered by tapping a button.
+- Resolution: support Enter-key submission directly from the textarea in rapid capture mode and restore focus only after the save state fully settles.
+- Prevention: for keyboard-heavy iPhone flows, do not rely solely on post-async `focus()` to keep the virtual keyboard alive after a button tap; provide an in-keyboard submit path when the mode is optimized for fast repeated entry.
+- References:
+  - `components/capture/CaptureForm.tsx`
+  - `components/capture/CaptureTextarea.tsx`
+
 ### App shell must not scroll at the viewport level
 - Status: active
 - First seen: 2026-04-18

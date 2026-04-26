@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-27 — Rapid capture keyboard submit and focus retention
+- Status: completed
+- Summary: added Enter-key submission for rapid capture on iPhone and moved focus restoration to run after the save state settles so repeated entry is more reliable after save.
+
 ### 2026-04-26 — Auth guard with returnTo for all protected routes
 - Status: completed
 - Summary: added `useAuthGuard` hook that redirects unauthenticated users to `/login?returnTo=<path>`; applied to all 9 protected routes; login page reads `returnTo` and redirects there after sign-in.

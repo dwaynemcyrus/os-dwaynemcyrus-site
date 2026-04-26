@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LABELS } from "@/lib/constants/labels";
 import { createCapturedItem } from "@/lib/items/itemCommands";
 import { isEmptyCaptureContent } from "@/lib/utils/guards";
@@ -23,12 +23,20 @@ export function CaptureForm({
 }: CaptureFormProps) {
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const shouldRestoreFocusRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const isDisabled = isSaving || isEmptyCaptureContent(content);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  useEffect(() => {
+    if (!rapidCapture || isSaving || !shouldRestoreFocusRef.current) {
+      return;
+    }
 
+    shouldRestoreFocusRef.current = false;
+    textareaRef.current?.focus();
+  }, [isSaving, rapidCapture]);
+
+  async function submitCapture() {
     if (isDisabled) {
       return;
     }
@@ -41,9 +49,7 @@ export function CaptureForm({
       await onSubmitted?.();
 
       if (rapidCapture) {
-        window.requestAnimationFrame(() => {
-          textareaRef.current?.focus();
-        });
+        shouldRestoreFocusRef.current = true;
         return;
       }
 
@@ -53,9 +59,37 @@ export function CaptureForm({
     }
   }
 
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void submitCapture();
+  }
+
+  function handleTextareaKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (
+      !rapidCapture ||
+      event.key !== "Enter" ||
+      event.shiftKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.nativeEvent.isComposing
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    void submitCapture();
+  }
+
   return (
     <form className={styles.captureForm} onSubmit={handleSubmit}>
-      <CaptureTextarea onChange={setContent} ref={textareaRef} value={content} />
+      <CaptureTextarea
+        enterKeyHint={rapidCapture ? "send" : undefined}
+        onChange={setContent}
+        onKeyDown={handleTextareaKeyDown}
+        ref={textareaRef}
+        value={content}
+      />
       <label className={styles["captureForm__toggle"]}>
         <input
           checked={rapidCapture}
