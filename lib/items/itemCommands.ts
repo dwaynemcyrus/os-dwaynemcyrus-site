@@ -13,6 +13,8 @@ import {
   DEFAULT_SYNC_STATE,
   LOCAL_USER_ID,
   type CreateLocalItemInput,
+  type ItemStatus,
+  type ItemSubtype,
   type ItemType,
 } from "@/lib/items/itemTypes";
 import { getSessionUserId } from "@/lib/supabase/auth";
@@ -30,13 +32,16 @@ export async function createCapturedItem({ content }: CreateLocalItemInput) {
     createdAt: timestamp,
     deviceCreatedAt: timestamp,
     deviceUpdatedAt: timestamp,
+    endAt: null,
     id: createItemId(),
     isTrashed: false,
     lastSyncedAt: null,
     needsRemoteCreate: true,
     needsRemoteDelete: false,
     needsRemoteUpdate: false,
+    startAt: null,
     status: DEFAULT_ITEM_STATUS,
+    subtype: null,
     syncErrorMessage: null,
     syncState: DEFAULT_SYNC_STATE,
     trashedAt: null,
@@ -83,7 +88,16 @@ export async function hardDeleteItem(id: string) {
   void runSyncQueue("delete");
 }
 
-export type ProcessingDecision = "project" | "reference" | "task" | "trash" | "incubate";
+export type ProcessingOutcome = {
+  content: string;
+  decision: "incubate" | "media" | "project" | "reference" | "task" | "trash";
+  endAt?: string | null;
+  id: string;
+  nextActionContent?: string;
+  startAt?: string | null;
+  status?: ItemStatus;
+  subtype?: ItemSubtype | null;
+};
 
 function getMutationSyncFlags(item: Awaited<ReturnType<typeof getItemById>>) {
   if (!item) {
@@ -107,7 +121,11 @@ async function updateItemForProcessing(
   id: string,
   patch: {
     content: string;
+    endAt?: string | null;
     isTrashed: boolean;
+    startAt?: string | null;
+    status?: ItemStatus;
+    subtype?: ItemSubtype | null;
     trashedAt: string | null;
     type?: ItemType;
   },
@@ -131,15 +149,8 @@ async function updateItemForProcessing(
   return nextItem;
 }
 
-export async function processInboxItem({
-  content,
-  decision,
-  id,
-}: {
-  content: string;
-  decision: ProcessingDecision;
-  id: string;
-}) {
+export async function processInboxItem(outcome: ProcessingOutcome) {
+  const { content, decision, endAt, id, nextActionContent, startAt, status, subtype } = outcome;
   const normalizedContent = normalizeCaptureContent(content);
 
   if (decision === "trash") {
@@ -150,11 +161,86 @@ export async function processInboxItem({
     });
   }
 
+  if (decision === "task") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      endAt: endAt ?? null,
+      isTrashed: false,
+      startAt: startAt ?? null,
+      status: status ?? DEFAULT_ITEM_STATUS,
+      trashedAt: null,
+      type: "task",
+    });
+  }
+
+  if (decision === "project") {
+    const result = await updateItemForProcessing(id, {
+      content: normalizedContent,
+      isTrashed: false,
+      trashedAt: null,
+      type: "project",
+    });
+
+    if (nextActionContent && nextActionContent.trim().length > 0) {
+      const timestamp = createTimestamp();
+      const userId = (await getSessionUserId()) ?? LOCAL_USER_ID;
+
+      await createItem({
+        content: normalizeCaptureContent(nextActionContent),
+        createdAt: timestamp,
+        deviceCreatedAt: timestamp,
+        deviceUpdatedAt: timestamp,
+        endAt: null,
+        id: createItemId(),
+        isTrashed: false,
+        lastSyncedAt: null,
+        needsRemoteCreate: true,
+        needsRemoteDelete: false,
+        needsRemoteUpdate: false,
+        startAt: null,
+        status: DEFAULT_ITEM_STATUS,
+        subtype: null,
+        syncErrorMessage: null,
+        syncState: DEFAULT_SYNC_STATE,
+        trashedAt: null,
+        type: "task",
+        updatedAt: timestamp,
+        userId,
+      });
+
+      notifyItemsChanged();
+      void runSyncQueue("process");
+    }
+
+    return result;
+  }
+
+  if (decision === "reference") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      isTrashed: false,
+      subtype: subtype ?? null,
+      trashedAt: null,
+      type: "reference",
+    });
+  }
+
+  if (decision === "media") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      isTrashed: false,
+      subtype: subtype ?? null,
+      trashedAt: null,
+      type: "media",
+    });
+  }
+
+  // incubate
   return updateItemForProcessing(id, {
     content: normalizedContent,
     isTrashed: false,
     trashedAt: null,
-    type: decision,
+    type: "incubate",
   });
 }
 

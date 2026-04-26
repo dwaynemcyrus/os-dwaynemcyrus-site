@@ -10,14 +10,25 @@ All notable commit-ready changes to this project should be recorded here.
 - New outcome views for `/tasks`, `/notes`, and `/incubate`.
 - Session-scoped rapid capture toggle in the shared capture dialog for repeated local saves without closing the modal.
 - New current v5 build spec for split task/project destination views and a dedicated `/projects` route.
+- Full GTD processing flow: 2-minute rule (Do it now), Waiting For, Schedule (calendar dates), Project with optional next-action capture, Reference with subtype, and Consume with subtype.
+- New `media` item type for consume (read/watch later) items with subtypes: article, book, video, podcast.
+- New `subtype` field on items for reference (note, article, book) and media types.
+- New `startAt` and `endAt` date fields on items for calendar scheduling without changing the item type.
+- New `waiting` status value — any item type can be set to waiting without changing its type.
+- New destination views: `/reference` (replaces `/notes`), `/media`, `/waiting`, `/calendar`.
+- Database migration adding `subtype`, `start_at`, `end_at` columns and `media`/`waiting` constraints.
 
 ### Changed
 - Promoted `docs/build-specs/build-spec-v4-gtd-processing-wizard.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v5-task-project-destination-views.md` to the current build in the build-spec entrypoint.
+- Promoted `docs/build-specs/build-spec-v6-gtd-full-flow.md` to the current build in the build-spec entrypoint.
 - Re-defined inbox processing around `type = 'unknown'` and added `project` plus `incubate` as canonical processed types.
 - Moved the trash navigation entry from `/settings` to the home screen.
 - Moved backup export from the home account panel into `/settings` and restricted the signed-out home screen to auth-only UI.
 - Split destination review so `/tasks` shows only `task`, `/projects` shows only `project`, and both destinations are promoted to the signed-in home screen.
+- Expanded `processInboxItem` to accept a `ProcessingOutcome` object covering all GTD branches including subtype, status, and date fields.
+- `/notes` now redirects to `/reference`; all reference items live under the reference route.
+- Home navigation updated with four new destination buttons: Reference, Consume, Waiting For, Calendar.
 
 ### Fixed
 - Normalized legacy `someday` data and backups to `incubate` for the new processing model.

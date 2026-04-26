@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-26 — V6 GTD full flow expansion
+- Status: completed
+- Summary: added all missing GTD processing branches (2-minute rule, Waiting For, Calendar, Project with next-action capture, Reference with subtype, Consume/media with subtype); added `subtype`, `startAt`, `endAt` fields to the data model; added `media` type and `waiting` status; added `/reference`, `/media`, `/waiting`, `/calendar` destination routes; redirected `/notes` to `/reference`; updated home navigation with all new destination buttons.
+
 ### 2026-04-27 — Rapid capture keyboard submit and focus retention
 - Status: completed
 - Summary: added Enter-key submission for rapid capture on iPhone and moved focus restoration to run after the save state settles so repeated entry is more reliable after save.

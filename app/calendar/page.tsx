@@ -3,24 +3,19 @@
 import { AuthGate } from "@/components/auth/AuthGate";
 import { AppShell } from "@/components/app-shell/AppShell";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
-import { OpenCalendarButton } from "@/components/navigation/OpenCalendarButton";
-import { OpenListButton } from "@/components/navigation/OpenListButton";
-import { OpenMediaButton } from "@/components/navigation/OpenMediaButton";
-import { OpenProjectsButton } from "@/components/navigation/OpenProjectsButton";
-import { OpenProcessButton } from "@/components/navigation/OpenProcessButton";
-import { OpenReferenceButton } from "@/components/navigation/OpenReferenceButton";
-import { OpenSettingsButton } from "@/components/navigation/OpenSettingsButton";
-import { OpenTasksButton } from "@/components/navigation/OpenTasksButton";
-import { OpenTrashButton } from "@/components/navigation/OpenTrashButton";
-import { OpenWaitingButton } from "@/components/navigation/OpenWaitingButton";
+import { EmptyState } from "@/components/items/EmptyState";
+import { ItemList } from "@/components/items/ItemList";
+import { BackButton } from "@/components/navigation/BackButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
+import { useCalendarItems } from "@/lib/hooks/useCalendarItems";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 
-export default function Home() {
+export default function CalendarPage() {
   const captureDialog = useCaptureDialog();
+  const { items, isLoading } = useCalendarItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 
@@ -36,8 +31,9 @@ export default function Home() {
           />
         }
         fabLabel={LABELS.capture}
+        headerLeft={<BackButton />}
         onFabPress={captureDialog.openDialog}
-        title="Home"
+        title={LABELS.calendar}
       >
         <SyncStatusBar
           label={label}
@@ -45,16 +41,11 @@ export default function Home() {
           refreshDisabled={isSyncing}
           showRefresh={true}
         />
-        <OpenSettingsButton />
-        <OpenProcessButton />
-        <OpenListButton />
-        <OpenTasksButton />
-        <OpenProjectsButton />
-        <OpenWaitingButton />
-        <OpenCalendarButton />
-        <OpenReferenceButton />
-        <OpenMediaButton />
-        <OpenTrashButton />
+        {isLoading ? null : items.length > 0 ? (
+          <ItemList items={items} />
+        ) : (
+          <EmptyState label={LABELS.emptyCalendarState} />
+        )}
       </AppShell>
     </AuthGate>
   );

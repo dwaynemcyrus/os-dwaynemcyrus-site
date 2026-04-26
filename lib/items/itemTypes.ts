@@ -5,15 +5,18 @@ export const LOCAL_USER_ID = "local-user";
 
 export type ItemType =
   | "content"
-  | "incubate"
   | "idea"
+  | "incubate"
   | "journal"
+  | "media"
   | "project"
   | "reference"
   | "task"
   | "unknown";
 
-export type ItemStatus = "backlog";
+export type ItemSubtype = "article" | "book" | "note" | "podcast" | "video";
+
+export type ItemStatus = "backlog" | "waiting";
 
 export type SyncState = "pending_sync" | "sync_error" | "synced";
 
@@ -22,13 +25,16 @@ export type LocalItem = {
   createdAt: string;
   deviceCreatedAt: string;
   deviceUpdatedAt: string;
+  endAt: string | null;
   id: string;
   isTrashed: boolean;
   lastSyncedAt: string | null;
   needsRemoteCreate: boolean;
   needsRemoteDelete: boolean;
   needsRemoteUpdate: boolean;
+  startAt: string | null;
   status: ItemStatus;
+  subtype: ItemSubtype | null;
   syncErrorMessage: string | null;
   syncState: SyncState;
   trashedAt: string | null;
@@ -47,6 +53,7 @@ export function normalizeItemType(value: string): ItemType {
     case "idea":
     case "incubate":
     case "journal":
+    case "media":
     case "project":
     case "reference":
     case "task":
@@ -56,5 +63,27 @@ export function normalizeItemType(value: string): ItemType {
       return "incubate";
     default:
       return "unknown";
+  }
+}
+
+export function normalizeItemSubtype(value: string | null | undefined): ItemSubtype | null {
+  switch (value) {
+    case "article":
+    case "book":
+    case "note":
+    case "podcast":
+    case "video":
+      return value;
+    default:
+      return null;
+  }
+}
+
+export function normalizeItemStatus(value: string | null | undefined): ItemStatus {
+  switch (value) {
+    case "waiting":
+      return "waiting";
+    default:
+      return "backlog";
   }
 }

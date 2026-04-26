@@ -60,6 +60,41 @@ export async function getItemsByTypes(types: ItemType[]) {
   );
 }
 
+export async function getReferenceItems() {
+  return getItemsByTypes(["reference"]);
+}
+
+export async function getMediaItems() {
+  return getItemsByTypes(["media"]);
+}
+
+export async function getWaitingItems() {
+  const items = await getAllItems();
+
+  return sortByCreatedAtDescending(
+    items.filter(
+      (item) => !item.isTrashed && !item.needsRemoteDelete && item.status === "waiting",
+    ),
+  );
+}
+
+export async function getCalendarItems() {
+  const items = await getAllItems();
+
+  const scheduled = items.filter(
+    (item) =>
+      !item.isTrashed &&
+      !item.needsRemoteDelete &&
+      (item.startAt !== null || item.endAt !== null),
+  );
+
+  return scheduled.sort((left, right) => {
+    const leftDate = left.startAt ?? left.endAt ?? "";
+    const rightDate = right.startAt ?? right.endAt ?? "";
+    return leftDate.localeCompare(rightDate);
+  });
+}
+
 export async function getSyncCounts() {
   const [failed, pending] = await Promise.all([
     getItemsBySyncState("sync_error"),
