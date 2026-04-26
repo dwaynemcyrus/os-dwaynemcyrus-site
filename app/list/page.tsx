@@ -7,7 +7,7 @@ import { ItemList } from "@/components/items/ItemList";
 import { BackButton } from "@/components/navigation/BackButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
-import { useAuthSession } from "@/lib/hooks/useAuthSession";
+import { useAuthGuard } from "@/lib/hooks/useAuthGuard";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useItems } from "@/lib/hooks/useItems";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
@@ -15,12 +15,16 @@ import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 
 export default function ListPage() {
   const captureDialog = useCaptureDialog();
-  const { hasSession } = useAuthSession();
+  const { hasSession, isReady } = useAuthGuard();
   const { isLoading, items, refreshItems } = useItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 
   useRetrySync();
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <AppShell

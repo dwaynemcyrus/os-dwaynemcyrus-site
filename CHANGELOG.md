@@ -28,6 +28,7 @@ All notable commit-ready changes to this project should be recorded here.
 - Moved hardcoded `"Inbox"`, `"Next Actions"`, and `"Projects"` strings into `LABELS`.
 - Eliminated the sign-in form flash on load for authenticated users by gating the home page on auth resolution before rendering.
 - Eliminated app chrome and FAB visibility for unauthenticated users by redirecting unresolved or signed-out sessions from `/` to `/login`.
+- Protected all routes against unauthenticated direct navigation via a shared `useAuthGuard` hook; redirects to `/login?returnTo=<path>` and returns the user to their intended destination after sign-in.
 
 ## 1.1.0 - 2026-04-21
 

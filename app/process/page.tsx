@@ -7,7 +7,7 @@ import { ProcessProgress } from "@/components/processing/ProcessProgress";
 import { ProcessWizard } from "@/components/processing/ProcessWizard";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
-import { useAuthSession } from "@/lib/hooks/useAuthSession";
+import { useAuthGuard } from "@/lib/hooks/useAuthGuard";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useProcessingItems } from "@/lib/hooks/useProcessingItems";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
@@ -15,7 +15,7 @@ import { useRetrySync } from "@/lib/hooks/useRetrySync";
 
 export default function ProcessPage() {
   const captureDialog = useCaptureDialog();
-  const { hasSession } = useAuthSession();
+  const { hasSession, isReady } = useAuthGuard();
   const { errorMessage, isLoading, items, refreshItems } = useProcessingItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
@@ -23,6 +23,10 @@ export default function ProcessPage() {
   const showProgress = !isLoading && !(errorMessage && !currentItem);
 
   useRetrySync();
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <AppShell

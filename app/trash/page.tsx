@@ -9,7 +9,7 @@ import { ItemList } from "@/components/items/ItemList";
 import { BackButton } from "@/components/navigation/BackButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
-import { useAuthSession } from "@/lib/hooks/useAuthSession";
+import { useAuthGuard } from "@/lib/hooks/useAuthGuard";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
@@ -19,7 +19,7 @@ import type { LocalItem } from "@/lib/items/itemTypes";
 
 export default function TrashPage() {
   const captureDialog = useCaptureDialog();
-  const { hasSession } = useAuthSession();
+  const { hasSession, isReady } = useAuthGuard();
   const { isLoading, items, refreshItems } = useTrashedItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
@@ -27,6 +27,10 @@ export default function TrashPage() {
   const [isDeleting, startDeleteTransition] = useTransition();
 
   useRetrySync();
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <AppShell

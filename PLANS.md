@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-26 — Auth guard with returnTo for all protected routes
+- Status: completed
+- Summary: added `useAuthGuard` hook that redirects unauthenticated users to `/login?returnTo=<path>`; applied to all 9 protected routes; login page reads `returnTo` and redirects there after sign-in.
+
 ### 2026-04-26 — Dedicated /login route and auth loading gate
 - Status: completed
 - Summary: moved the sign-in form to a dedicated `/login` route with no app chrome; added a loading gate and client-side redirect to the home page so unauthenticated users never see app content or the FAB; simplified `AuthPanel` to signed-in display only.

@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell/AppShell";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
@@ -14,26 +12,19 @@ import { OpenTrashButton } from "@/components/navigation/OpenTrashButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
-import { useAuthSession } from "@/lib/hooks/useAuthSession";
+import { useAuthGuard } from "@/lib/hooks/useAuthGuard";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 
 export default function Home() {
-  const router = useRouter();
   const captureDialog = useCaptureDialog();
-  const { hasSession, isLoading } = useAuthSession();
+  const { hasSession, isReady } = useAuthGuard();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 
   useRetrySync();
 
-  useEffect(() => {
-    if (!isLoading && !hasSession) {
-      router.replace("/login");
-    }
-  }, [isLoading, hasSession, router]);
-
-  if (isLoading || !hasSession) {
+  if (!isReady) {
     return null;
   }
 

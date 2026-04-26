@@ -31,7 +31,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && hasSession) {
-      router.replace("/");
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get("returnTo") ?? "/";
+      router.replace(returnTo);
     }
   }, [isLoading, hasSession, router]);
 
