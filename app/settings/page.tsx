@@ -1,39 +1,36 @@
 "use client";
 
+import { AuthGate } from "@/components/auth/AuthGate";
 import { AppShell } from "@/components/app-shell/AppShell";
+import { AuthPanel } from "@/components/auth/AuthPanel";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { BackButton } from "@/components/navigation/BackButton";
-import { AuthPanel } from "@/components/auth/AuthPanel";
 import { RestoreBackupPanel } from "@/components/settings/RestoreBackupPanel";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
 import { LABELS } from "@/lib/constants/labels";
-import { useAuthGuard } from "@/lib/hooks/useAuthGuard";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 
 export default function SettingsPage() {
   const captureDialog = useCaptureDialog();
-  const { isReady } = useAuthGuard();
-
-  if (!isReady) {
-    return null;
-  }
 
   return (
-    <AppShell
-      dialogSlot={
-        <CaptureDialog
-          onOpenChange={captureDialog.setOpen}
-          open={captureDialog.open}
-        />
-      }
-      fabLabel={LABELS.capture}
-      headerLeft={<BackButton />}
-      onFabPress={captureDialog.openDialog}
-      title={LABELS.settings}
-    >
-      <AuthPanel />
-      <SettingsPanel />
-      <RestoreBackupPanel />
-    </AppShell>
+    <AuthGate>
+      <AppShell
+        dialogSlot={
+          <CaptureDialog
+            onOpenChange={captureDialog.setOpen}
+            open={captureDialog.open}
+          />
+        }
+        fabLabel={LABELS.capture}
+        headerLeft={<BackButton />}
+        onFabPress={captureDialog.openDialog}
+        title={LABELS.settings}
+      >
+        <AuthPanel />
+        <SettingsPanel />
+        <RestoreBackupPanel />
+      </AppShell>
+    </AuthGate>
   );
 }
