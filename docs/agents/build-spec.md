@@ -15,7 +15,7 @@ and defines how future build specs should be referenced as the project grows.
 
 ## Current Build
 
-Current build: `docs/build-specs/build-spec-v6-gtd-full-flow.md`
+Current build: `docs/build-specs/build-spec-v7-writing-workspace.md`
 
 This is the build spec to follow unless a newer build is explicitly marked as
 current in this file.
@@ -95,7 +95,7 @@ These remain active regardless of which build spec is current:
 As of this revision:
 
 - the repo now contains the implemented v1 PSA application
-- the active build has moved to the full GTD flow milestone (v6)
+- the active build has moved to the writing workspace milestone (v7)
 - project tooling is defined in `package.json`
 - verification commands should be discovered from the current scripts before work begins
 

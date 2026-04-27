@@ -7,6 +7,7 @@ All notable commit-ready changes to this project should be recorded here.
 ### Added
 - Dedicated `/login` route with a standalone sign-in form, no app chrome, and post-auth redirect to home.
 - Dedicated `/process` route for one-item-at-a-time inbox processing with simplified GTD decisions.
+- Dedicated `/writing` workspace with `/writing/[itemId]` markdown editing over processed items.
 - New outcome views for `/tasks`, `/notes`, and `/incubate`.
 - Session-scoped rapid capture toggle in the shared capture dialog for repeated local saves without closing the modal.
 - New current v5 build spec for split task/project destination views and a dedicated `/projects` route.
@@ -16,6 +17,7 @@ All notable commit-ready changes to this project should be recorded here.
 - New `subtype` field on items for reference (note, article, book) and media types.
 - New `startAt` and `endAt` date fields on items for calendar scheduling without changing the item type.
 - New `waiting` status value — any item type can be set to waiting without changing its type.
+- New `documentFrontmatter` item field backed by `document_frontmatter` in Supabase for exact raw frontmatter preservation.
 - New destination views: `/reference` (replaces `/notes`), `/media`, `/waiting`, `/calendar`.
 - Database migration adding `subtype`, `start_at`, `end_at` columns and `media`/`waiting` constraints.
 
@@ -23,6 +25,7 @@ All notable commit-ready changes to this project should be recorded here.
 - Promoted `docs/build-specs/build-spec-v4-gtd-processing-wizard.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v5-task-project-destination-views.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v6-gtd-full-flow.md` to the current build in the build-spec entrypoint.
+- Promoted `docs/build-specs/build-spec-v7-writing-workspace.md` to the current build in the build-spec entrypoint.
 - Re-defined inbox processing around `type = 'unknown'` and added `project` plus `incubate` as canonical processed types.
 - Moved the trash navigation entry from `/settings` to the home screen.
 - Moved backup export from the home account panel into `/settings` and restricted the signed-out home screen to auth-only UI.
@@ -30,6 +33,7 @@ All notable commit-ready changes to this project should be recorded here.
 - Expanded `processInboxItem` to accept a `ProcessingOutcome` object covering all GTD branches including subtype, status, and date fields.
 - `/notes` now redirects to `/reference`; all reference items live under the reference route.
 - Home navigation updated with four new destination buttons: Reference, Consume, Waiting For, Calendar.
+- Processed destination rows now open into the writing workspace, and backups now round-trip `subtype`, scheduling fields, and document frontmatter.
 
 ### Fixed
 - Normalized legacy `someday` data and backups to `incubate` for the new processing model.
@@ -42,6 +46,9 @@ All notable commit-ready changes to this project should be recorded here.
 - Eliminated the sign-in form flash on load for authenticated users by gating the home page on auth resolution before rendering.
 - Eliminated app chrome and FAB visibility for unauthenticated users by redirecting unresolved or signed-out sessions from `/` to `/login`.
 - Protected all routes against unauthenticated direct navigation via a shared `useAuthGuard` hook; redirects to `/login?returnTo=<path>` and returns the user to their intended destination after sign-in.
+
+### Docs
+- Added and activated `build-spec-v7-writing-workspace.md` for the markdown writing workspace over processed items, with exact frontmatter preservation and a reserved `os` metadata block.
 
 ## 1.1.0 - 2026-04-21
 

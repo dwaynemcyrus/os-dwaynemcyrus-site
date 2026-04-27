@@ -10,6 +10,7 @@ export type RemoteItemRecord = {
   created_at: string;
   device_created_at: string;
   device_updated_at: string;
+  document_frontmatter: string | null;
   end_at: string | null;
   id: string;
   is_trashed: boolean;
@@ -34,6 +35,7 @@ export function mapLocalItemToRemoteRecord(
     created_at: item.createdAt,
     device_created_at: item.deviceCreatedAt,
     device_updated_at: item.deviceUpdatedAt,
+    document_frontmatter: item.documentFrontmatter,
     end_at: item.endAt,
     id: item.id,
     is_trashed: item.isTrashed,
@@ -55,6 +57,7 @@ export function mapRemoteRecordToLocalItem(record: RemoteItemRecord): LocalItem 
     createdAt: record.created_at,
     deviceCreatedAt: record.device_created_at,
     deviceUpdatedAt: record.device_updated_at,
+    documentFrontmatter: record.document_frontmatter,
     endAt: record.end_at,
     id: record.id,
     isTrashed: record.is_trashed,

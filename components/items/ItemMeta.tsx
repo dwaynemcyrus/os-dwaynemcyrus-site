@@ -2,6 +2,7 @@ import type { SyncState } from "@/lib/items/itemTypes";
 import styles from "./ItemMeta.module.css";
 
 type ItemMetaProps = {
+  detail?: string;
   syncState: SyncState;
 };
 
@@ -11,6 +12,6 @@ const LABELS: Record<SyncState, string> = {
   synced: "synced",
 };
 
-export function ItemMeta({ syncState }: ItemMetaProps) {
-  return <p className={styles.itemMeta}>{LABELS[syncState]}</p>;
+export function ItemMeta({ detail, syncState }: ItemMetaProps) {
+  return <p className={styles.itemMeta}>{detail ? `${detail} · ${LABELS[syncState]}` : LABELS[syncState]}</p>;
 }

@@ -3,6 +3,7 @@ import type { SyncStatusLabel } from "@/lib/constants/labels";
 import {
   getAllItems,
   getItemsBySyncState,
+  getItemById,
   getTrashedItems,
   getVisibleItems,
 } from "@/lib/db/itemRepository";
@@ -39,6 +40,10 @@ function isVisibleTypedItem(
   return !item.isTrashed && !item.needsRemoteDelete && types.includes(item.type);
 }
 
+function isWritableItem(item: Awaited<ReturnType<typeof getAllItems>>[number]) {
+  return !item.isTrashed && !item.needsRemoteDelete && item.type !== "unknown";
+}
+
 export async function getInboxItems() {
   const items = await getVisibleItems();
   return items.filter((item) => item.type === "unknown");
@@ -58,6 +63,24 @@ export async function getItemsByTypes(types: ItemType[]) {
   return sortByCreatedAtDescending(
     items.filter((item) => isVisibleTypedItem(item, types)),
   );
+}
+
+export async function getWritingItems() {
+  const items = await getAllItems();
+
+  return [...items]
+    .filter(isWritableItem)
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+}
+
+export async function getWritableItemById(id: string) {
+  const item = await getItemById(id);
+
+  if (!item || !isWritableItem(item)) {
+    return null;
+  }
+
+  return item;
 }
 
 export async function getReferenceItems() {

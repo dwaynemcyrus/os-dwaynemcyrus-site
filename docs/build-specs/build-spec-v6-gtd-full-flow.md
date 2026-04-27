@@ -13,10 +13,8 @@ now implemented-reference status.
 
 ## Status
 
-- current
-- active
-- implementation should follow this file while
-  `docs/agents/build-spec.md` points here
+- implemented-reference
+- superseded by `build-spec-v7-writing-workspace.md`
 
 ---
 

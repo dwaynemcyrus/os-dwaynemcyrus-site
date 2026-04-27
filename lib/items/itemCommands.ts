@@ -17,6 +17,7 @@ import {
   type ItemSubtype,
   type ItemType,
 } from "@/lib/items/itemTypes";
+import { parseWritingDocumentForSave } from "@/lib/writing/documentModel";
 import { getSessionUserId } from "@/lib/supabase/auth";
 import { runSyncQueue } from "@/lib/sync/syncQueue";
 import { createTimestamp } from "@/lib/utils/datetime";
@@ -32,6 +33,7 @@ export async function createCapturedItem({ content }: CreateLocalItemInput) {
     createdAt: timestamp,
     deviceCreatedAt: timestamp,
     deviceUpdatedAt: timestamp,
+    documentFrontmatter: null,
     endAt: null,
     id: createItemId(),
     isTrashed: false,
@@ -190,6 +192,7 @@ export async function processInboxItem(outcome: ProcessingOutcome) {
         createdAt: timestamp,
         deviceCreatedAt: timestamp,
         deviceUpdatedAt: timestamp,
+        documentFrontmatter: null,
         endAt: null,
         id: createItemId(),
         isTrashed: false,
@@ -246,4 +249,39 @@ export async function processInboxItem(outcome: ProcessingOutcome) {
 
 export function retryFailedSync() {
   return runSyncQueue("retry");
+}
+
+export async function saveWritingDocument(
+  id: string,
+  rawDocument: string,
+) {
+  const item = await getItemById(id);
+
+  if (!item) {
+    throw new Error("The item was not found.");
+  }
+
+  const parsed = parseWritingDocumentForSave(rawDocument);
+  const timestamp = createTimestamp();
+  const syncFlags = getMutationSyncFlags(item);
+
+  const nextItem = await updateItem(id, {
+    content: parsed.content,
+    deviceUpdatedAt: timestamp,
+    documentFrontmatter: parsed.documentFrontmatter,
+    endAt: parsed.os.endAt,
+    startAt: parsed.os.startAt,
+    status: parsed.os.status,
+    subtype: parsed.os.subtype,
+    syncErrorMessage: null,
+    syncState: "pending_sync",
+    type: parsed.os.type,
+    updatedAt: timestamp,
+    ...syncFlags,
+  });
+
+  notifyItemsChanged();
+  void runSyncQueue("process");
+
+  return nextItem;
 }

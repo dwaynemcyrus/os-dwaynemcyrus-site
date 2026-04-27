@@ -58,6 +58,19 @@ future sessions do not need to rediscover them.
 
 ## Architecture
 
+### Writing frontmatter must stay raw and isolate native routing under `os`
+- Status: active
+- First seen: 2026-04-27
+- Last seen: 2026-04-27
+- Symptom: a document editor can easily flatten custom metadata, lose frontmatter comments/order, or let freeform keys accidentally destabilize the app's native GTD routing.
+- Root cause: the OS uses a fixed item schema for sync and routing, but the writing workspace allows arbitrary markdown frontmatter and user-defined metadata.
+- Resolution: persist the raw frontmatter text in `documentFrontmatter`, preserve it exactly through save/sync/backup/restore, and treat only the reserved `os` block as native routing metadata.
+- Prevention: do not reserialize or normalize frontmatter outside raw markdown save, and do not let top-level custom keys directly control destination routing.
+- References:
+  - `lib/writing/documentModel.ts`
+  - `lib/items/itemCommands.ts`
+  - `lib/backup/backupTypes.ts`
+
 ### URL title enrichment should be display-only and fetched through a server route
 - Status: active
 - First seen: 2026-04-27

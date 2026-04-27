@@ -2,6 +2,21 @@ export const DEFAULT_ITEM_TYPE = "unknown";
 export const DEFAULT_ITEM_STATUS = "backlog";
 export const DEFAULT_SYNC_STATE = "pending_sync";
 export const LOCAL_USER_ID = "local-user";
+export const WRITING_OS_TYPES = [
+  "task",
+  "project",
+  "reference",
+  "media",
+  "incubate",
+] as const;
+export const WRITING_OS_STATUSES = ["backlog", "waiting"] as const;
+export const WRITING_ITEM_SUBTYPES = [
+  "article",
+  "book",
+  "note",
+  "podcast",
+  "video",
+] as const;
 
 export type ItemType =
   | "content"
@@ -25,6 +40,7 @@ export type LocalItem = {
   createdAt: string;
   deviceCreatedAt: string;
   deviceUpdatedAt: string;
+  documentFrontmatter: string | null;
   endAt: string | null;
   id: string;
   isTrashed: boolean;

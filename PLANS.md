@@ -11,6 +11,14 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-27 — V7 writing workspace
+- Status: completed
+- Summary: activated the v7 writing workspace build, added `/writing` and `/writing/[itemId]`, introduced exact-preserved raw document frontmatter with a reserved `os` block for native routing fields, and extended sync plus backup/restore compatibility for writing metadata.
+
+### 2026-04-27 — Future writing workspace build spec
+- Status: completed
+- Summary: added a non-current `build-spec-v7-writing-workspace.md` defining a markdown writing workspace over processed items with exact frontmatter preservation, freeform document metadata, and a reserved `os` block for native routing fields.
+
 ### 2026-04-27 — Derived titles and URL enrichment for processed items
 - Status: completed
 - Summary: kept the single stored `content` field, derived first-line display titles for processed items, added server-fetched URL title enrichment for public links, and added a processing preview without rewriting stored content.

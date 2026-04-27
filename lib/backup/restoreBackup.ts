@@ -1,6 +1,7 @@
 import {
   BACKUP_REMOTE_COLUMNS,
   LEGACY_PSA_BACKUP_FORMAT,
+  PSA_BACKUP_V2_FORMAT,
   PSA_BACKUP_FORMAT,
   type BackupItem,
   type BackupPayload,
@@ -11,7 +12,11 @@ import {
   mapRemoteRecordToLocalItem,
   type RemoteItemRecord,
 } from "@/lib/items/itemMappers";
-import { normalizeItemType, type LocalItem } from "@/lib/items/itemTypes";
+import {
+  normalizeItemSubtype,
+  normalizeItemType,
+  type LocalItem,
+} from "@/lib/items/itemTypes";
 import { getAuthenticatedUserId } from "@/lib/supabase/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { runSyncQueue } from "@/lib/sync/syncQueue";
@@ -77,6 +82,7 @@ function isBackupPayload(value: unknown): value is BackupPayload {
 
   return (
     (value.format === PSA_BACKUP_FORMAT ||
+      value.format === PSA_BACKUP_V2_FORMAT ||
       value.format === LEGACY_PSA_BACKUP_FORMAT) &&
     value.source === "supabase" &&
     isString(value.exportedAt) &&
@@ -100,16 +106,17 @@ function mapBackupItemToPendingLocalItem(
     createdAt: item.createdAt,
     deviceCreatedAt: item.deviceCreatedAt,
     deviceUpdatedAt: item.deviceUpdatedAt,
+    documentFrontmatter: item.documentFrontmatter ?? null,
     id: item.id,
     isTrashed: item.isTrashed,
     lastSyncedAt: remoteRecord?.last_synced_at ?? item.lastSyncedAt,
-    endAt: null,
+    endAt: item.endAt ?? null,
     needsRemoteCreate: remoteRecord === null,
     needsRemoteDelete: false,
     needsRemoteUpdate: remoteRecord !== null,
-    startAt: null,
+    startAt: item.startAt ?? null,
     status: item.status,
-    subtype: null,
+    subtype: normalizeItemSubtype(item.subtype ?? null),
     syncErrorMessage: null,
     syncState: "pending_sync",
     trashedAt: item.trashedAt,

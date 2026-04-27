@@ -13,6 +13,7 @@ import { OpenSettingsButton } from "@/components/navigation/OpenSettingsButton";
 import { OpenTasksButton } from "@/components/navigation/OpenTasksButton";
 import { OpenTrashButton } from "@/components/navigation/OpenTrashButton";
 import { OpenWaitingButton } from "@/components/navigation/OpenWaitingButton";
+import { OpenWritingButton } from "@/components/navigation/OpenWritingButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
@@ -54,6 +55,7 @@ export default function Home() {
         <OpenCalendarButton />
         <OpenReferenceButton />
         <OpenMediaButton />
+        <OpenWritingButton />
         <OpenTrashButton />
       </AppShell>
     </AuthGate>

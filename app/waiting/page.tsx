@@ -8,10 +8,12 @@ import { ItemList } from "@/components/items/ItemList";
 import { BackButton } from "@/components/navigation/BackButton";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
+import { getWritingItemRoute } from "@/lib/constants/routes";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 import { useWaitingItems } from "@/lib/hooks/useWaitingItems";
+import { getWritingItemMetaLabel } from "@/lib/writing/itemMeta";
 
 export default function WaitingPage() {
   const captureDialog = useCaptureDialog();
@@ -42,7 +44,12 @@ export default function WaitingPage() {
           showRefresh={true}
         />
         {isLoading ? null : items.length > 0 ? (
-          <ItemList items={items} presentation="processed" />
+          <ItemList
+            getItemHref={(item) => getWritingItemRoute(item.id)}
+            getMetaLabel={getWritingItemMetaLabel}
+            items={items}
+            presentation="processed"
+          />
         ) : (
           <EmptyState label={LABELS.emptyWaitingState} />
         )}

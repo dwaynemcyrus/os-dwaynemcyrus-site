@@ -10,14 +10,14 @@ import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
 import { getWritingItemRoute } from "@/lib/constants/routes";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
-import { useItemsByTypes } from "@/lib/hooks/useItemsByTypes";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
+import { useWritingItems } from "@/lib/hooks/useWritingItems";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 import { getWritingItemMetaLabel } from "@/lib/writing/itemMeta";
 
-export default function ProjectsPage() {
+export default function WritingPage() {
   const captureDialog = useCaptureDialog();
-  const { items, isLoading } = useItemsByTypes(["project"]);
+  const { items, isLoading } = useWritingItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 
@@ -35,7 +35,7 @@ export default function ProjectsPage() {
         fabLabel={LABELS.capture}
         headerLeft={<BackButton />}
         onFabPress={captureDialog.openDialog}
-        title={LABELS.projects}
+        title={LABELS.writing}
       >
         <SyncStatusBar
           label={label}
@@ -51,7 +51,7 @@ export default function ProjectsPage() {
             presentation="processed"
           />
         ) : (
-          <EmptyState label={LABELS.emptyProjectsState} />
+          <EmptyState label={LABELS.emptyWritingState} />
         )}
       </AppShell>
     </AuthGate>
