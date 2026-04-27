@@ -134,6 +134,19 @@ the existing `/tasks` and `/projects` routes.
 
 ---
 
+## Destination Item Presentation
+
+- processed destination routes derive a display title from the first non-empty
+  line of `content`
+- remaining lines render as body/details below that title
+- if the first line is a public URL, the UI may replace the raw URL title with
+  fetched page metadata for display
+- URL-title fallback order is metadata title → hostname/path label → raw URL
+- this is display-only enrichment; stored `content` remains unchanged
+- inbox `/list` remains raw capture text rather than title/body presentation
+
+---
+
 ## Home Navigation
 
 Add four new nav buttons to the home screen:

@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-27 — Derived titles and URL enrichment for processed items
+- Status: completed
+- Summary: kept the single stored `content` field, derived first-line display titles for processed items, added server-fetched URL title enrichment for public links, and added a processing preview without rewriting stored content.
+
 ### 2026-04-26 — V6 GTD full flow expansion
 - Status: completed
 - Summary: added all missing GTD processing branches (2-minute rule, Waiting For, Calendar, Project with next-action capture, Reference with subtype, Consume/media with subtype); added `subtype`, `startAt`, `endAt` fields to the data model; added `media` type and `waiting` status; added `/reference`, `/media`, `/waiting`, `/calendar` destination routes; redirected `/notes` to `/reference`; updated home navigation with all new destination buttons.

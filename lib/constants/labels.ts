@@ -47,6 +47,7 @@ export const LABELS = {
   processInbox: "Process Inbox",
   project: "Project",
   projects: "Projects",
+  previewTitle: "Preview title",
   rapidCapture: "Rapid capture",
   reference: "Reference",
   refreshSync: "Refresh sync",

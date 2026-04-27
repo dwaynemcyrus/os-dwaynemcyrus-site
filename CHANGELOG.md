@@ -10,6 +10,7 @@ All notable commit-ready changes to this project should be recorded here.
 - New outcome views for `/tasks`, `/notes`, and `/incubate`.
 - Session-scoped rapid capture toggle in the shared capture dialog for repeated local saves without closing the modal.
 - New current v5 build spec for split task/project destination views and a dedicated `/projects` route.
+- Display-derived titles for processed items with first-line splitting and server-fetched URL title enrichment for public links.
 - Full GTD processing flow: 2-minute rule (Do it now), Waiting For, Schedule (calendar dates), Project with optional next-action capture, Reference with subtype, and Consume with subtype.
 - New `media` item type for consume (read/watch later) items with subtypes: article, book, video, podcast.
 - New `subtype` field on items for reference (note, article, book) and media types.

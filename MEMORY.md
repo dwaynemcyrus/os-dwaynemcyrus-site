@@ -58,6 +58,19 @@ future sessions do not need to rediscover them.
 
 ## Architecture
 
+### URL title enrichment should be display-only and fetched through a server route
+- Status: active
+- First seen: 2026-04-27
+- Last seen: 2026-04-27
+- Symptom: raw URL captures look poor as processed-item titles, client-side metadata fetches to arbitrary sites are unreliable, and rewriting stored content would distort the original capture.
+- Root cause: the item model intentionally persists only `content`, browser fetches to arbitrary public pages are constrained by CORS and hostile HTML, and there is no separate stored title field.
+- Resolution: derive titles from the first non-empty line, fetch metadata through a server route for URL-first items, and treat the metadata only as read-time presentation.
+- Prevention: do not add client-only scraping for arbitrary URLs and do not silently rewrite stored `content` just to improve processed-item titles.
+- References:
+  - `app/api/link-metadata/route.ts`
+  - `lib/items/itemPresentation.ts`
+  - `components/items/ItemRow.tsx`
+
 ### Local capture must not await remote sync
 - Status: active
 - First seen: 2026-04-18

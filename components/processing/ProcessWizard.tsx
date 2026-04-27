@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { TextButton } from "@/components/primitives/TextButton";
 import { LABELS } from "@/lib/constants/labels";
+import { useLinkMetadata } from "@/lib/hooks/useLinkMetadata";
+import { deriveItemPresentation } from "@/lib/items/itemPresentation";
 import {
   processInboxItem,
   type ProcessingOutcome,
@@ -52,6 +54,9 @@ export function ProcessWizard({
   const [startAt, setStartAt] = useState("");
   const [endAt, setEndAt] = useState("");
   const [nextActionContent, setNextActionContent] = useState("");
+  const preview = deriveItemPresentation(content);
+  const { title: enrichedPreviewTitle } = useLinkMetadata(preview.firstLineUrl);
+  const previewTitle = enrichedPreviewTitle ?? preview.titleFallback;
 
   if (isLoading) {
     return (
@@ -129,6 +134,12 @@ export function ProcessWizard({
           value={content}
         />
       </div>
+      {previewTitle ? (
+        <div className={styles.wizard__preview}>
+          <p className={styles.wizard__label}>{LABELS.previewTitle}</p>
+          <p className={styles.wizard__previewTitle}>{previewTitle}</p>
+        </div>
+      ) : null}
 
       {/* Step: clarify */}
       {step === "clarify" ? (

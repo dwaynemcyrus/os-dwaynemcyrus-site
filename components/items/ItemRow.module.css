@@ -11,6 +11,23 @@
   line-height: 1.5;
 }
 
+.itemRow__contentGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.itemRow__title {
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.itemRow__body {
+  color: var(--color-muted);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
 .itemRow__footer {
   display: flex;
   align-items: center;

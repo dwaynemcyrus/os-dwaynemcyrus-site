@@ -42,7 +42,7 @@ export default function MediaPage() {
           showRefresh={true}
         />
         {isLoading ? null : items.length > 0 ? (
-          <ItemList items={items} />
+          <ItemList items={items} presentation="processed" />
         ) : (
           <EmptyState label={LABELS.emptyMediaState} />
         )}
