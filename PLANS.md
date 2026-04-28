@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-28 — Writing editor save-loop fix
+- Status: completed
+- Summary: fixed the writing editor so one save request is handled only once per click and successful saves establish a new local saved snapshot, preventing frontmatter-only edits from getting stuck in repeated `Saving...` cycles.
+
 ### 2026-04-28 — Localhost auth storage isolation
 - Status: completed
 - Summary: isolated Supabase auth storage on localhost so the dev server no longer reuses stale persisted sessions from other app contexts and signed-out startup avoids invalid refresh-token noise.

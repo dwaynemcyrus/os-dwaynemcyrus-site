@@ -109,6 +109,17 @@ future sessions do not need to rediscover them.
 
 ## UI / UX
 
+### Save-trigger effects must not key off a sticky signal without acknowledging it
+- Status: active
+- First seen: 2026-04-28
+- Last seen: 2026-04-28
+- Symptom: the writing editor can get stuck in repeated `Saving...` cycles after one save click, especially when parent item state updates arrive slightly later than the local save promise resolution.
+- Root cause: a save effect was keyed off a monotonically increasing signal but did not record that the current signal had already been handled, so the effect could retrigger itself on subsequent renders before the parent item snapshot caught up.
+- Resolution: record the last handled save signal and update the editor's local saved snapshot immediately after a successful save.
+- Prevention: when using signal-based save effects, always make the trigger idempotent per signal and do not rely solely on parent prop updates to clear local dirty state.
+- References:
+  - `components/writing/WritingEditor.tsx`
+
 ### Rapid capture on iPhone should not rely on async refocus after tapping Save
 - Status: active
 - First seen: 2026-04-27

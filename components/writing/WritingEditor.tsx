@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import type { LocalItem } from "@/lib/items/itemTypes";
 import { TextButton } from "@/components/primitives/TextButton";
@@ -37,10 +37,12 @@ export function WritingEditor({
 }: WritingEditorProps) {
   const serializedDocument = useMemo(() => serializeWritingDocument(item), [item]);
   const [documentDraft, setDocumentDraft] = useState(serializedDocument);
+  const [savedDocument, setSavedDocument] = useState(serializedDocument);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const handledSaveSignalRef = useRef(0);
 
-  const isDirty = documentDraft !== serializedDocument;
+  const isDirty = documentDraft !== savedDocument;
   const body = useMemo(() => getWritingDocumentBody(documentDraft), [documentDraft]);
   const linkTargets = useMemo(() => buildWritingLinkTargets(allItems), [allItems]);
   const renderedHtml = useMemo(
@@ -57,18 +59,30 @@ export function WritingEditor({
   }, [isSaving, onSavingChange]);
 
   useEffect(() => {
-    if (saveSignal === 0 || !isDirty || isSaving) {
+    if (
+      saveSignal === 0 ||
+      saveSignal === handledSaveSignalRef.current ||
+      !isDirty ||
+      isSaving
+    ) {
       return;
     }
 
     let cancelled = false;
+    handledSaveSignalRef.current = saveSignal;
 
     async function save() {
       setIsSaving(true);
       setErrorMessage(null);
 
       try {
-        await saveWritingDocument(item.id, documentDraft);
+        const nextItem = await saveWritingDocument(item.id, documentDraft);
+        const nextSavedDocument = serializeWritingDocument(nextItem);
+
+        if (!cancelled) {
+          setSavedDocument(nextSavedDocument);
+          setDocumentDraft(nextSavedDocument);
+        }
       } catch (error) {
         if (!cancelled) {
           setErrorMessage(error instanceof Error ? error.message : "Save failed.");
