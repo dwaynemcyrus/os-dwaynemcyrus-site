@@ -38,6 +38,7 @@ All notable commit-ready changes to this project should be recorded here.
 ### Fixed
 - Normalized legacy `someday` data and backups to `incubate` for the new processing model.
 - Improved rapid capture on iPhone by allowing Enter-key submission from the virtual keyboard and restoring textarea focus more reliably after save.
+- Isolated Supabase auth storage for localhost dev so the dev server no longer inherits stale persisted sessions and triggers invalid refresh-token noise for signed-out use.
 - Hardened the inbox processing wizard against duplicate decision taps, blocking load hangs, and misleading progress messaging during inbox loading failures.
 - Corrected the back button destination on `/tasks`, `/notes`, and `/incubate` to return to home instead of `/settings`.
 - Fixed the processing wizard back button to return to the previous step rather than always resetting to clarify.

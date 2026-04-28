@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-04-28 — Localhost auth storage isolation
+- Status: completed
+- Summary: isolated Supabase auth storage on localhost so the dev server no longer reuses stale persisted sessions from other app contexts and signed-out startup avoids invalid refresh-token noise.
+
 ### 2026-04-27 — V7 writing workspace
 - Status: completed
 - Summary: activated the v7 writing workspace build, added `/writing` and `/writing/[itemId]`, introduced exact-preserved raw document frontmatter with a reserved `os` block for native routing fields, and extended sync plus backup/restore compatibility for writing metadata.

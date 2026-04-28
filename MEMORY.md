@@ -18,6 +18,17 @@ future sessions do not need to rediscover them.
 
 ## Tooling
 
+### Localhost auth storage should not share the main browser session bucket
+- Status: active
+- First seen: 2026-04-28
+- Last seen: 2026-04-28
+- Symptom: opening the dev server as a signed-out user can still trigger Supabase refresh-token errors in the console before the app settles, even though the app then clears the stale session.
+- Root cause: the Supabase browser client reuses the same persisted auth storage key across app contexts, so localhost can inherit an old session from another environment and attempt an immediate refresh on boot.
+- Resolution: give localhost its own auth `storageKey` when creating the Supabase browser client.
+- Prevention: isolate dev auth persistence from production or other app contexts whenever the same Supabase project is reused across environments.
+- References:
+  - `lib/supabase/client.ts`
+
 ### Initial hook loads should not call state-setting helpers directly from effects
 - Status: active
 - First seen: 2026-04-18
