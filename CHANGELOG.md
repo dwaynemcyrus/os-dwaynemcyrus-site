@@ -45,6 +45,7 @@ All notable commit-ready changes to this project should be recorded here.
 - Processed destination rows now open into the writing workspace, and backups now round-trip `subtype`, scheduling fields, and document frontmatter.
 
 ### Fixed
+- Prevented pending local type-registry seed rows from repeatedly posting duplicate names after the same registry types already exist remotely.
 - Added a follow-up migration to requeue existing items as `kind = capture`, `status = later`, and `type = null` for the current processing build.
 - Avoided querying the remote `type_registry` table during ordinary app-load sync unless registry data actually needs syncing.
 - Cached `/process` and `/settings` shells for offline PWA navigation.

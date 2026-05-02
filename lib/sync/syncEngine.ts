@@ -24,6 +24,7 @@ import {
   type RemoteItemRecord,
 } from "@/lib/items/itemMappers";
 import type { LocalItem } from "@/lib/items/itemTypes";
+import { canonicalizeTypeName } from "@/lib/items/itemTypes";
 import {
   mapLocalTypeRegistryEntryToRemoteRecord,
   mapRemoteTypeRegistryRecordToLocalEntry,
@@ -329,10 +330,24 @@ async function syncPendingTypeRegistryEntries(userId: string) {
     };
   }
 
-  const [failedEntries, pendingEntries] = await Promise.all([
+  const [allEntries, failedEntries, pendingEntries] = await Promise.all([
+    getAllTypeRegistryEntries(),
     getTypeRegistryEntriesBySyncState("sync_error"),
     getTypeRegistryEntriesBySyncState("pending_sync"),
   ]);
+  const remoteBackedKeys = new Set(
+    allEntries
+      .filter(
+        (entry) =>
+          entry.userId === userId &&
+          !entry.needsRemoteCreate &&
+          !entry.needsRemoteDelete,
+      )
+      .map(
+        (entry) =>
+          `${entry.kind}:${canonicalizeTypeName(entry.name)}`,
+      ),
+  );
   const entries = Array.from(
     new Map(
       [...pendingEntries, ...failedEntries]
@@ -344,6 +359,14 @@ async function syncPendingTypeRegistryEntries(userId: string) {
   let syncedCount = 0;
 
   for (const entry of entries) {
+    const registryKey = `${entry.kind}:${canonicalizeTypeName(entry.name)}`;
+
+    if (entry.needsRemoteCreate && remoteBackedKeys.has(registryKey)) {
+      await removeTypeRegistryEntry(entry.id);
+      syncedCount += 1;
+      continue;
+    }
+
     const payload = mapLocalTypeRegistryEntryToRemoteRecord(entry, userId);
     const { error } = await supabase
       .from("type_registry")
