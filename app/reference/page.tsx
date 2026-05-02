@@ -10,14 +10,14 @@ import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
 import { getWritingItemRoute } from "@/lib/constants/routes";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
-import { useItemsByTypes } from "@/lib/hooks/useItemsByTypes";
+import { useItemsByKind } from "@/lib/hooks/useItemsByKind";
 import { useRefreshSync, useSyncStatus } from "@/lib/hooks/useSyncStatus";
 import { useRetrySync } from "@/lib/hooks/useRetrySync";
 import { getWritingItemMetaLabel } from "@/lib/writing/itemMeta";
 
 export default function ReferencePage() {
   const captureDialog = useCaptureDialog();
-  const { items, isLoading } = useItemsByTypes(["reference"]);
+  const { items, isLoading } = useItemsByKind("reference");
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
 

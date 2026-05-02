@@ -1,5 +1,13 @@
-const CACHE_NAME = "psa-shell-v1";
-const SHELL_URLS = ["/", "/list", "/manifest.webmanifest", "/icon", "/apple-icon"];
+const CACHE_NAME = "psa-shell-v2";
+const SHELL_URLS = [
+  "/",
+  "/list",
+  "/process",
+  "/settings",
+  "/manifest.webmanifest",
+  "/icon",
+  "/apple-icon",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

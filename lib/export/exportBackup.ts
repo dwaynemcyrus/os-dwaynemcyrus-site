@@ -17,15 +17,23 @@ export type ExportBackupResult = {
 
 function mapRemoteRecordToExportItem(record: RemoteItemRecord): BackupItem {
   return {
+    archivedAt: record.archived_at,
+    completedAt: record.completed_at,
     content: record.content,
     createdAt: record.created_at,
+    delegatedTo: record.delegated_to,
     deviceCreatedAt: record.device_created_at,
     deviceUpdatedAt: record.device_updated_at,
     documentFrontmatter: record.document_frontmatter,
     endAt: record.end_at,
     id: record.id,
+    incubatedAt: record.incubated_at,
+    isArchived: record.is_archived,
     isTrashed: record.is_trashed,
+    kind: record.kind,
     lastSyncedAt: record.last_synced_at,
+    metadata: record.metadata as Record<string, unknown>,
+    parentId: record.parent_id,
     startAt: record.start_at,
     status: record.status,
     subtype: record.subtype,
@@ -34,6 +42,7 @@ function mapRemoteRecordToExportItem(record: RemoteItemRecord): BackupItem {
     type: normalizeItemType(record.type),
     updatedAt: record.updated_at,
     userId: record.user_id,
+    waitingReason: record.waiting_reason,
   };
 }
 

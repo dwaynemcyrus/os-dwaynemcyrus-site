@@ -3,6 +3,7 @@ import {
   WRITING_ITEM_SUBTYPES,
   WRITING_OS_STATUSES,
   WRITING_OS_TYPES,
+  type ItemKind,
   type ItemStatus,
   type ItemSubtype,
 } from "@/lib/items/itemTypes";
@@ -17,6 +18,7 @@ type ParsedDocumentParts = {
 
 type OsFrontmatter = {
   endAt: string | null;
+  kind: ItemKind;
   startAt: string | null;
   status: ItemStatus;
   subtype: ItemSubtype | null;
@@ -57,17 +59,11 @@ function createSeedFrontmatter(item: LocalItem) {
   return stringify({
     os: {
       endAt: item.endAt,
+      kind: item.kind,
       startAt: item.startAt,
       status: item.status,
       subtype: item.subtype,
-      type:
-        item.type === "task" ||
-        item.type === "project" ||
-        item.type === "reference" ||
-        item.type === "media" ||
-        item.type === "incubate"
-          ? item.type
-          : "reference",
+      type: item.type ?? "capture",
     },
   }).trimEnd();
 }
@@ -78,6 +74,7 @@ function validateOsFrontmatter(osValue: unknown): OsFrontmatter {
   }
 
   const type = osValue.type;
+  const kind = osValue.kind;
   const status = osValue.status;
   const subtype = osValue.subtype;
   const startAt = osValue.startAt;
@@ -85,6 +82,16 @@ function validateOsFrontmatter(osValue: unknown): OsFrontmatter {
 
   if (typeof type !== "string" || !WRITING_OS_TYPES.includes(type as never)) {
     throw new Error("`os.type` must be a built-in writing destination.");
+  }
+
+  if (
+    kind !== undefined &&
+    kind !== "action" &&
+    kind !== "capture" &&
+    kind !== "creation" &&
+    kind !== "reference"
+  ) {
+    throw new Error("`os.kind` must be a supported kind.");
   }
 
   if (
@@ -112,11 +119,28 @@ function validateOsFrontmatter(osValue: unknown): OsFrontmatter {
 
   return {
     endAt: endAt ?? null,
+    kind: (kind ?? deriveKindFromWritingType(type)) as ItemKind,
     startAt: startAt ?? null,
     status: status as ItemStatus,
     subtype: (subtype ?? null) as ItemSubtype | null,
     type: type as (typeof WRITING_OS_TYPES)[number],
   };
+}
+
+function deriveKindFromWritingType(type: unknown): ItemKind {
+  if (type === "task" || type === "project" || type === "habit") {
+    return "action";
+  }
+
+  if (type === "capture") {
+    return "capture";
+  }
+
+  if (type === "creation") {
+    return "creation";
+  }
+
+  return "reference";
 }
 
 export function serializeWritingDocument(item: LocalItem) {

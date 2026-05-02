@@ -1,5 +1,6 @@
 import type { LocalItem } from "@/lib/items/itemTypes";
 
 export function getWritingItemMetaLabel(item: LocalItem) {
-  return item.status === "waiting" ? `${item.type} · waiting` : item.type;
+  const typeLabel = item.type ?? item.kind;
+  return item.status === "waiting" ? `${typeLabel} · waiting` : typeLabel;
 }

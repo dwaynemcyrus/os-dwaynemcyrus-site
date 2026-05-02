@@ -1,6 +1,6 @@
 # Build Spec — Capture Processing Feature
 
-**Status:** Draft v1
+**Status:** current / active
 **Audience:** Solo developer + Codex CLI agent
 **Companion docs:** `AGENTS.md` (implementation conventions, library choices, stack-specific patterns)
 

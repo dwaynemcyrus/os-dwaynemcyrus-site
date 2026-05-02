@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-05-02 — V8 capture processing overhaul
+- Status: completed
+- Summary: activated the v8 capture processing build, added additive v8 item fields plus local/remote type registry support, rewrote capture processing around the v8 decision tree, added Types settings management, and added focused Vitest coverage for registry logic.
+
 ### 2026-04-28 — Writing editor save-loop fix
 - Status: completed
 - Summary: fixed the writing editor so one save request is handled only once per click and successful saves establish a new local saved snapshot, preventing frontmatter-only edits from getting stuck in repeated `Saving...` cycles.

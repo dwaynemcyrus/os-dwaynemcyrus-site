@@ -10,12 +10,13 @@ import { notifyItemsChanged } from "@/lib/items/itemEvents";
 import {
   DEFAULT_ITEM_STATUS,
   DEFAULT_ITEM_TYPE,
+  DEFAULT_ITEM_KIND,
   DEFAULT_SYNC_STATE,
   LOCAL_USER_ID,
   type CreateLocalItemInput,
+  type ItemKind,
+  type ItemMetadata,
   type ItemStatus,
-  type ItemSubtype,
-  type ItemType,
 } from "@/lib/items/itemTypes";
 import { parseWritingDocumentForSave } from "@/lib/writing/documentModel";
 import { getSessionUserId } from "@/lib/supabase/auth";
@@ -29,18 +30,26 @@ export async function createCapturedItem({ content }: CreateLocalItemInput) {
   const userId = (await getSessionUserId()) ?? LOCAL_USER_ID;
 
   const item = await createItem({
+    archivedAt: null,
+    completedAt: null,
     content: normalizeCaptureContent(content),
     createdAt: timestamp,
+    delegatedTo: null,
     deviceCreatedAt: timestamp,
     deviceUpdatedAt: timestamp,
     documentFrontmatter: null,
     endAt: null,
     id: createItemId(),
+    incubatedAt: null,
+    isArchived: false,
     isTrashed: false,
+    kind: DEFAULT_ITEM_KIND,
     lastSyncedAt: null,
+    metadata: {},
     needsRemoteCreate: true,
     needsRemoteDelete: false,
     needsRemoteUpdate: false,
+    parentId: null,
     startAt: null,
     status: DEFAULT_ITEM_STATUS,
     subtype: null,
@@ -50,6 +59,7 @@ export async function createCapturedItem({ content }: CreateLocalItemInput) {
     type: DEFAULT_ITEM_TYPE,
     updatedAt: timestamp,
     userId,
+    waitingReason: null,
   });
 
   notifyItemsChanged();
@@ -92,13 +102,26 @@ export async function hardDeleteItem(id: string) {
 
 export type ProcessingOutcome = {
   content: string;
-  decision: "incubate" | "media" | "project" | "reference" | "task" | "trash";
+  delegatedTo?: string | null;
+  decision:
+    | "completed-task"
+    | "creation"
+    | "dated-task"
+    | "delegated-task"
+    | "habit"
+    | "incubate"
+    | "project"
+    | "reference"
+    | "task"
+    | "trash"
+    | "waiting-task";
   endAt?: string | null;
   id: string;
-  nextActionContent?: string;
+  metadata?: ItemMetadata;
   startAt?: string | null;
   status?: ItemStatus;
-  subtype?: ItemSubtype | null;
+  type?: string | null;
+  waitingReason?: string | null;
 };
 
 function getMutationSyncFlags(item: Awaited<ReturnType<typeof getItemById>>) {
@@ -121,16 +144,21 @@ function getMutationSyncFlags(item: Awaited<ReturnType<typeof getItemById>>) {
 
 async function updateItemForProcessing(
   id: string,
-  patch: {
+  patch: Partial<{
+    completedAt: string | null;
     content: string;
-    endAt?: string | null;
+    delegatedTo: string | null;
+    endAt: string | null;
+    incubatedAt: string | null;
     isTrashed: boolean;
-    startAt?: string | null;
-    status?: ItemStatus;
-    subtype?: ItemSubtype | null;
+    kind: ItemKind;
+    metadata: ItemMetadata;
+    startAt: string | null;
+    status: ItemStatus;
     trashedAt: string | null;
-    type?: ItemType;
-  },
+    type: string | null;
+    waitingReason: string | null;
+  }>,
 ) {
   const timestamp = createTimestamp();
   const item = await getItemById(id);
@@ -151,100 +179,161 @@ async function updateItemForProcessing(
   return nextItem;
 }
 
-export async function processInboxItem(outcome: ProcessingOutcome) {
-  const { content, decision, endAt, id, nextActionContent, startAt, status, subtype } = outcome;
+export async function updateCaptureContent(id: string, content: string) {
   const normalizedContent = normalizeCaptureContent(content);
+
+  return updateItemForProcessing(id, {
+    content: normalizedContent,
+  });
+}
+
+function assertProcessableCapture(item: Awaited<ReturnType<typeof getItemById>>) {
+  if (!item) {
+    throw new Error("The item was not found.");
+  }
+
+  if (item.kind !== "capture" || item.isTrashed || item.needsRemoteDelete) {
+    throw new Error("This item was processed elsewhere.");
+  }
+}
+
+export async function processInboxItem(outcome: ProcessingOutcome) {
+  const {
+    content,
+    decision,
+    delegatedTo,
+    endAt,
+    id,
+    metadata,
+    startAt,
+    type,
+    waitingReason,
+  } = outcome;
+  const normalizedContent = normalizeCaptureContent(content);
+  const currentItem = await getItemById(id);
+  assertProcessableCapture(currentItem);
+  const timestamp = createTimestamp();
 
   if (decision === "trash") {
     return updateItemForProcessing(id, {
       content: normalizedContent,
       isTrashed: true,
-      trashedAt: createTimestamp(),
+      trashedAt: timestamp,
+    });
+  }
+
+  if (decision === "incubate") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      incubatedAt: timestamp,
+      status: "incubate",
+    });
+  }
+
+  if (decision === "habit") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      endAt: endAt ?? null,
+      kind: "action",
+      metadata: metadata ?? {},
+      startAt: startAt ?? null,
+      status: "later",
+      type: "habit",
+    });
+  }
+
+  if (decision === "project") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      endAt: endAt ?? null,
+      kind: "action",
+      startAt: startAt ?? null,
+      status: waitingReason ? "waiting" : "later",
+      type: "project",
+      waitingReason: waitingReason ?? null,
+    });
+  }
+
+  if (decision === "completed-task") {
+    return updateItemForProcessing(id, {
+      completedAt: timestamp,
+      content: normalizedContent,
+      kind: "action",
+      status: "complete",
+      type: "task",
+    });
+  }
+
+  if (decision === "delegated-task") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      delegatedTo: delegatedTo ?? "",
+      kind: "action",
+      status: "waiting",
+      type: "task",
+    });
+  }
+
+  if (decision === "waiting-task") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      kind: "action",
+      status: "waiting",
+      type: "task",
+      waitingReason: waitingReason ?? "",
+    });
+  }
+
+  if (decision === "dated-task") {
+    return updateItemForProcessing(id, {
+      content: normalizedContent,
+      endAt: endAt ?? null,
+      kind: "action",
+      startAt: startAt ?? null,
+      status: "later",
+      type: "task",
     });
   }
 
   if (decision === "task") {
     return updateItemForProcessing(id, {
       content: normalizedContent,
-      endAt: endAt ?? null,
-      isTrashed: false,
-      startAt: startAt ?? null,
-      status: status ?? DEFAULT_ITEM_STATUS,
-      trashedAt: null,
+      kind: "action",
+      status: "later",
       type: "task",
     });
   }
 
-  if (decision === "project") {
-    const result = await updateItemForProcessing(id, {
-      content: normalizedContent,
-      isTrashed: false,
-      trashedAt: null,
-      type: "project",
-    });
-
-    if (nextActionContent && nextActionContent.trim().length > 0) {
-      const timestamp = createTimestamp();
-      const userId = (await getSessionUserId()) ?? LOCAL_USER_ID;
-
-      await createItem({
-        content: normalizeCaptureContent(nextActionContent),
-        createdAt: timestamp,
-        deviceCreatedAt: timestamp,
-        deviceUpdatedAt: timestamp,
-        documentFrontmatter: null,
-        endAt: null,
-        id: createItemId(),
-        isTrashed: false,
-        lastSyncedAt: null,
-        needsRemoteCreate: true,
-        needsRemoteDelete: false,
-        needsRemoteUpdate: false,
-        startAt: null,
-        status: DEFAULT_ITEM_STATUS,
-        subtype: null,
-        syncErrorMessage: null,
-        syncState: DEFAULT_SYNC_STATE,
-        trashedAt: null,
-        type: "task",
-        updatedAt: timestamp,
-        userId,
-      });
-
-      notifyItemsChanged();
-      void runSyncQueue("process");
+  if (decision === "reference") {
+    if (!type) {
+      throw new Error("Choose a reference type.");
     }
 
-    return result;
-  }
-
-  if (decision === "reference") {
     return updateItemForProcessing(id, {
       content: normalizedContent,
-      isTrashed: false,
-      subtype: subtype ?? null,
-      trashedAt: null,
-      type: "reference",
+      kind: "reference",
+      status: "later",
+      type,
     });
   }
 
-  if (decision === "media") {
+  if (decision === "creation") {
+    if (!type) {
+      throw new Error("Choose a creation type.");
+    }
+
     return updateItemForProcessing(id, {
       content: normalizedContent,
-      isTrashed: false,
-      subtype: subtype ?? null,
-      trashedAt: null,
-      type: "media",
+      endAt: endAt ?? null,
+      kind: "creation",
+      startAt: startAt ?? null,
+      status: waitingReason ? "waiting" : "later",
+      type,
+      waitingReason: waitingReason ?? null,
     });
   }
 
-  // incubate
-  return updateItemForProcessing(id, {
-    content: normalizedContent,
-    isTrashed: false,
-    trashedAt: null,
-    type: "incubate",
-  });
+  throw new Error("Unsupported processing decision.");
 }
 
 export function retryFailedSync() {
@@ -270,6 +359,7 @@ export async function saveWritingDocument(
     deviceUpdatedAt: timestamp,
     documentFrontmatter: parsed.documentFrontmatter,
     endAt: parsed.os.endAt,
+    kind: parsed.os.kind,
     startAt: parsed.os.startAt,
     status: parsed.os.status,
     subtype: parsed.os.subtype,

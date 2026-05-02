@@ -3,7 +3,6 @@
 import { AppShell } from "@/components/app-shell/AppShell";
 import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { BackButton } from "@/components/navigation/BackButton";
-import { ProcessProgress } from "@/components/processing/ProcessProgress";
 import { ProcessWizard } from "@/components/processing/ProcessWizard";
 import { SyncStatusBar } from "@/components/sync/SyncStatusBar";
 import { LABELS } from "@/lib/constants/labels";
@@ -18,8 +17,6 @@ export default function ProcessPage() {
   const { errorMessage, isLoading, items, refreshItems } = useProcessingItems();
   const { isSyncing, label } = useSyncStatus();
   const refreshSync = useRefreshSync();
-  const currentItem = items[0] ?? null;
-  const showProgress = !isLoading && !(errorMessage && !currentItem);
 
   useRetrySync();
 
@@ -43,12 +40,10 @@ export default function ProcessPage() {
           refreshDisabled={isSyncing}
           showRefresh={true}
         />
-        {showProgress ? <ProcessProgress remainingCount={items.length} /> : null}
         <ProcessWizard
           errorMessage={errorMessage}
           isLoading={isLoading}
-          item={currentItem}
-          key={currentItem?.id ?? "empty"}
+          items={items}
           onRetryLoad={() => {
             void refreshItems();
           }}

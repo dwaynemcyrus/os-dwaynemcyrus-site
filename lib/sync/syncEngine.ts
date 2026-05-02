@@ -9,6 +9,14 @@ import {
   setItemSynced,
   setItemSyncError,
 } from "@/lib/db/itemRepository";
+import {
+  getAllTypeRegistryEntries,
+  getTypeRegistryEntriesBySyncState,
+  removeTypeRegistryEntry,
+  saveTypeRegistryEntry,
+  setTypeRegistryEntrySynced,
+  setTypeRegistryEntrySyncError,
+} from "@/lib/db/typeRegistryRepository";
 import { notifyItemsChanged } from "@/lib/items/itemEvents";
 import {
   mapLocalItemToRemoteRecord,
@@ -16,6 +24,11 @@ import {
   type RemoteItemRecord,
 } from "@/lib/items/itemMappers";
 import type { LocalItem } from "@/lib/items/itemTypes";
+import {
+  mapLocalTypeRegistryEntryToRemoteRecord,
+  mapRemoteTypeRegistryRecordToLocalEntry,
+  type RemoteTypeRegistryRecord,
+} from "@/lib/registry/typeRegistryMappers";
 import { getAuthenticatedUserId } from "@/lib/supabase/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createTimestamp } from "@/lib/utils/datetime";
@@ -31,6 +44,7 @@ export type SyncRunReason =
   | "reconnect"
   | "restore"
   | "retry"
+  | "type-registry"
   | "trash";
 
 export type SyncRunResult = {
@@ -44,6 +58,24 @@ function sortSyncCandidates(items: LocalItem[]) {
   return [...items].sort((left, right) =>
     left.createdAt.localeCompare(right.createdAt),
   );
+}
+
+function shouldKeepLocalRegistryVersion(
+  localEntry: Awaited<ReturnType<typeof getAllTypeRegistryEntries>>[number],
+  remoteRecord: RemoteTypeRegistryRecord,
+) {
+  if (localEntry.needsRemoteDelete) {
+    return true;
+  }
+
+  const localIsUnsynced =
+    localEntry.syncState === "pending_sync" || localEntry.syncState === "sync_error";
+
+  if (!localIsUnsynced) {
+    return false;
+  }
+
+  return isNewerTimestamp(localEntry.updatedAt, remoteRecord.updated_at);
 }
 
 function mergeUniqueItems(items: LocalItem[]) {
@@ -155,6 +187,61 @@ async function pullRemoteItems(
   };
 }
 
+async function pullRemoteTypeRegistry(userId: string) {
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    return {
+      failedCount: 0,
+      pulledCount: 0,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("type_registry")
+    .select("*")
+    .eq("user_id", userId)
+    .order("name", { ascending: true });
+
+  if (error) {
+    return {
+      failedCount: 1,
+      pulledCount: 0,
+    };
+  }
+
+  const remoteRecords = (data ?? []) as RemoteTypeRegistryRecord[];
+  const localEntries = await getAllTypeRegistryEntries();
+  const localEntriesById = new Map(localEntries.map((entry) => [entry.id, entry]));
+  let pulledCount = 0;
+
+  for (const remoteRecord of remoteRecords) {
+    const localEntry = localEntriesById.get(remoteRecord.id);
+
+    if (localEntry && shouldKeepLocalRegistryVersion(localEntry, remoteRecord)) {
+      continue;
+    }
+
+    const nextEntry = mapRemoteTypeRegistryRecordToLocalEntry(remoteRecord);
+
+    if (!nextEntry) {
+      continue;
+    }
+
+    if (localEntry && remoteRecord.updated_at.localeCompare(localEntry.updatedAt) < 0) {
+      continue;
+    }
+
+    await saveTypeRegistryEntry(nextEntry);
+    pulledCount += 1;
+  }
+
+  return {
+    failedCount: 0,
+    pulledCount,
+  };
+}
+
 async function syncPendingDeletes(userId: string) {
   const supabase = getSupabaseBrowserClient();
 
@@ -193,6 +280,96 @@ async function syncPendingDeletes(userId: string) {
   };
 }
 
+async function syncPendingTypeRegistryDeletes(userId: string) {
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    return {
+      failedCount: 0,
+      syncedCount: 0,
+    };
+  }
+
+  const localEntries = await getAllTypeRegistryEntries();
+  const deleteCandidates = localEntries.filter((entry) => entry.needsRemoteDelete);
+  let failedCount = 0;
+  let syncedCount = 0;
+
+  for (const entry of deleteCandidates) {
+    const { error } = await supabase
+      .from("type_registry")
+      .delete()
+      .eq("id", entry.id)
+      .eq("user_id", userId);
+
+    if (error) {
+      failedCount += 1;
+      await setTypeRegistryEntrySyncError(entry.id, error.message);
+      continue;
+    }
+
+    await removeTypeRegistryEntry(entry.id);
+    syncedCount += 1;
+  }
+
+  return {
+    failedCount,
+    syncedCount,
+  };
+}
+
+async function syncPendingTypeRegistryEntries(userId: string) {
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    return {
+      attemptedCount: 0,
+      failedCount: 0,
+      syncedCount: 0,
+    };
+  }
+
+  const [failedEntries, pendingEntries] = await Promise.all([
+    getTypeRegistryEntriesBySyncState("sync_error"),
+    getTypeRegistryEntriesBySyncState("pending_sync"),
+  ]);
+  const entries = Array.from(
+    new Map(
+      [...pendingEntries, ...failedEntries]
+        .filter((entry) => !entry.needsRemoteDelete)
+        .map((entry) => [entry.id, entry]),
+    ).values(),
+  );
+  let failedCount = 0;
+  let syncedCount = 0;
+
+  for (const entry of entries) {
+    const payload = mapLocalTypeRegistryEntryToRemoteRecord(entry, userId);
+    const { error } = await supabase
+      .from("type_registry")
+      .upsert(payload, { onConflict: "id" });
+
+    if (error) {
+      failedCount += 1;
+      await setTypeRegistryEntrySyncError(entry.id, error.message);
+      continue;
+    }
+
+    syncedCount += 1;
+    await setTypeRegistryEntrySynced(entry.id, createTimestamp(), userId);
+  }
+
+  return {
+    attemptedCount: entries.length,
+    failedCount,
+    syncedCount,
+  };
+}
+
+async function shouldSyncTypeRegistry(reason: SyncRunReason) {
+  return reason === "manual" || reason === "type-registry";
+}
+
 export async function runSyncEngine(reason: SyncRunReason): Promise<SyncRunResult> {
   const supabase = getSupabaseBrowserClient();
 
@@ -218,6 +395,16 @@ export async function runSyncEngine(reason: SyncRunReason): Promise<SyncRunResul
 
   const deleteResult = await syncPendingDeletes(userId);
   const pullResult = await pullRemoteItems(userId, reason);
+  const shouldRunRegistrySync = await shouldSyncTypeRegistry(reason);
+  const registryDeleteResult = shouldRunRegistrySync
+    ? await syncPendingTypeRegistryDeletes(userId)
+    : { failedCount: 0, syncedCount: 0 };
+  const registryPullResult = shouldRunRegistrySync
+    ? await pullRemoteTypeRegistry(userId)
+    : { failedCount: 0, pulledCount: 0 };
+  const registryPushResult = shouldRunRegistrySync
+    ? await syncPendingTypeRegistryEntries(userId)
+    : { attemptedCount: 0, failedCount: 0, syncedCount: 0 };
 
   const [failedItems, pendingItems] = await Promise.all([
     getFailedSyncItems(),
@@ -229,8 +416,16 @@ export async function runSyncEngine(reason: SyncRunReason): Promise<SyncRunResul
       (item) => !item.needsRemoteDelete,
     ),
   );
-  let failedCount = pullResult.failedCount + deleteResult.failedCount;
-  let syncedCount = deleteResult.syncedCount;
+  let failedCount =
+    pullResult.failedCount +
+    deleteResult.failedCount +
+    registryDeleteResult.failedCount +
+    registryPullResult.failedCount +
+    registryPushResult.failedCount;
+  let syncedCount =
+    deleteResult.syncedCount +
+    registryDeleteResult.syncedCount +
+    registryPushResult.syncedCount;
 
   for (const item of items) {
     const syncedAt = createTimestamp();
@@ -249,12 +444,19 @@ export async function runSyncEngine(reason: SyncRunReason): Promise<SyncRunResul
     await setItemSynced(item.id, syncedAt, userId);
   }
 
-  if (items.length > 0 || pullResult.pulledCount > 0 || deleteResult.syncedCount > 0) {
+  if (
+    items.length > 0 ||
+    pullResult.pulledCount > 0 ||
+    deleteResult.syncedCount > 0 ||
+    registryDeleteResult.syncedCount > 0 ||
+    registryPullResult.pulledCount > 0 ||
+    registryPushResult.syncedCount > 0
+  ) {
     notifyItemsChanged();
   }
 
   return {
-    attemptedCount: items.length,
+    attemptedCount: items.length + registryPushResult.attemptedCount,
     failedCount,
     skippedReason: null,
     syncedCount,

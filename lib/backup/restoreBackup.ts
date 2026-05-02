@@ -2,6 +2,7 @@ import {
   BACKUP_REMOTE_COLUMNS,
   LEGACY_PSA_BACKUP_FORMAT,
   PSA_BACKUP_V2_FORMAT,
+  PSA_BACKUP_V3_FORMAT,
   PSA_BACKUP_FORMAT,
   type BackupItem,
   type BackupPayload,
@@ -15,6 +16,10 @@ import {
 import {
   normalizeItemSubtype,
   normalizeItemType,
+  deriveV8FieldsFromLegacyType,
+  normalizeItemKind,
+  normalizeItemStatus,
+  normalizeMetadata,
   type LocalItem,
 } from "@/lib/items/itemTypes";
 import { getAuthenticatedUserId } from "@/lib/supabase/auth";
@@ -62,7 +67,7 @@ function isBackupItem(value: unknown): value is BackupItem {
     isString(value.id) &&
     isString(value.userId) &&
     isString(value.content) &&
-    isString(value.type) &&
+    isNullableString(value.type) &&
     isString(value.status) &&
     isString(value.createdAt) &&
     isString(value.updatedAt) &&
@@ -82,6 +87,7 @@ function isBackupPayload(value: unknown): value is BackupPayload {
 
   return (
     (value.format === PSA_BACKUP_FORMAT ||
+      value.format === PSA_BACKUP_V3_FORMAT ||
       value.format === PSA_BACKUP_V2_FORMAT ||
       value.format === LEGACY_PSA_BACKUP_FORMAT) &&
     value.source === "supabase" &&
@@ -101,28 +107,49 @@ function mapBackupItemToPendingLocalItem(
   userId: string,
   remoteRecord: RemoteItemRecord | null,
 ): LocalItem {
+  const derived = deriveV8FieldsFromLegacyType({
+    status: item.status,
+    subtype: item.subtype ?? null,
+    type: item.type,
+  });
+  const status = item.kind ? normalizeItemStatus(item.status) : derived.status;
+
   return {
+    archivedAt: item.archivedAt ?? null,
+    completedAt: item.completedAt ?? null,
     content: item.content,
     createdAt: item.createdAt,
+    delegatedTo: item.delegatedTo ?? null,
     deviceCreatedAt: item.deviceCreatedAt,
     deviceUpdatedAt: item.deviceUpdatedAt,
     documentFrontmatter: item.documentFrontmatter ?? null,
     id: item.id,
+    incubatedAt:
+      item.incubatedAt ??
+      (normalizeItemStatus(item.status) === "incubate" ? item.updatedAt : null),
+    isArchived: item.isArchived ?? false,
     isTrashed: item.isTrashed,
+    kind: item.kind ? normalizeItemKind(item.kind) : derived.kind,
     lastSyncedAt: remoteRecord?.last_synced_at ?? item.lastSyncedAt,
     endAt: item.endAt ?? null,
+    metadata: {
+      ...derived.metadata,
+      ...normalizeMetadata(item.metadata),
+    },
     needsRemoteCreate: remoteRecord === null,
     needsRemoteDelete: false,
     needsRemoteUpdate: remoteRecord !== null,
+    parentId: item.parentId ?? null,
     startAt: item.startAt ?? null,
-    status: item.status,
+    status: normalizeItemStatus(status),
     subtype: normalizeItemSubtype(item.subtype ?? null),
     syncErrorMessage: null,
     syncState: "pending_sync",
     trashedAt: item.trashedAt,
-    type: normalizeItemType(item.type),
+    type: item.kind ? normalizeItemType(item.type) : derived.type,
     updatedAt: item.updatedAt,
     userId,
+    waitingReason: item.waitingReason ?? null,
   };
 }
 

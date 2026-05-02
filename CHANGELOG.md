@@ -5,6 +5,9 @@ All notable commit-ready changes to this project should be recorded here.
 ## Unreleased
 
 ### Added
+- V8 capture processing overhaul with additive item fields for kind, archive state, waiting/delegation details, metadata, completion, archive, and incubation timestamps.
+- Local-first type registry for reference, creation, and log types with seeded defaults, settings management, and background Supabase sync.
+- Focused Vitest setup and registry model tests for validation, case-insensitive uniqueness, and seed behavior.
 - Dedicated `/login` route with a standalone sign-in form, no app chrome, and post-auth redirect to home.
 - Dedicated `/process` route for one-item-at-a-time inbox processing with simplified GTD decisions.
 - Dedicated `/writing` workspace with `/writing/[itemId]` markdown editing over processed items.
@@ -22,6 +25,9 @@ All notable commit-ready changes to this project should be recorded here.
 - Database migration adding `subtype`, `start_at`, `end_at` columns and `media`/`waiting` constraints.
 
 ### Changed
+- Promoted `docs/build-specs/build-spec-v8-capture-processing-overhaul.md` to the current build in the build-spec entrypoint.
+- Reworked `/process` around the v8 keep/commit/kind decision tree with editable capture text, Back, Skip, Exit, and terminal conflict checks.
+- Updated capture defaults and destination queries to use v8 `kind`, `type`, and `status` semantics while keeping legacy fields compatible.
 - Promoted `docs/build-specs/build-spec-v4-gtd-processing-wizard.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v5-task-project-destination-views.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v6-gtd-full-flow.md` to the current build in the build-spec entrypoint.
@@ -37,6 +43,9 @@ All notable commit-ready changes to this project should be recorded here.
 - Processed destination rows now open into the writing workspace, and backups now round-trip `subtype`, scheduling fields, and document frontmatter.
 
 ### Fixed
+- Added a follow-up migration to requeue existing items as `kind = capture`, `status = later`, and `type = null` for the current processing build.
+- Avoided querying the remote `type_registry` table during ordinary app-load sync unless registry data actually needs syncing.
+- Cached `/process` and `/settings` shells for offline PWA navigation.
 - Normalized legacy `someday` data and backups to `incubate` for the new processing model.
 - Improved rapid capture on iPhone by allowing Enter-key submission from the virtual keyboard and restoring textarea focus more reliably after save.
 - Isolated Supabase auth storage for localhost dev so the dev server no longer inherits stale persisted sessions and triggers invalid refresh-token noise for signed-out use.
@@ -51,6 +60,7 @@ All notable commit-ready changes to this project should be recorded here.
 - Protected all routes against unauthenticated direct navigation via a shared `useAuthGuard` hook; redirects to `/login?returnTo=<path>` and returns the user to their intended destination after sign-in.
 
 ### Docs
+- Marked the v8 capture processing spec as current and recorded the companion PDF as a supporting reference.
 - Added and activated `build-spec-v7-writing-workspace.md` for the markdown writing workspace over processed items, with exact frontmatter preservation and a reserved `os` metadata block.
 - Added `README.md` with project overview, local development, verification, and repo workflow guidance.
 - Added `CLAUDE.md` and `GEMINI.md` instructional context files for alternate agent tooling.

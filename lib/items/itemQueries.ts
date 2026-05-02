@@ -7,7 +7,8 @@ import {
   getTrashedItems,
   getVisibleItems,
 } from "@/lib/db/itemRepository";
-import type { ItemType } from "@/lib/items/itemTypes";
+import { getTypeRegistryEntriesBySyncState } from "@/lib/db/typeRegistryRepository";
+import type { ItemKind, ItemType, TypeRegistryKind } from "@/lib/items/itemTypes";
 
 export function getVisibleBacklogItems() {
   return getInboxItems();
@@ -37,23 +38,53 @@ function isVisibleTypedItem(
   item: Awaited<ReturnType<typeof getAllItems>>[number],
   types: ItemType[],
 ) {
-  return !item.isTrashed && !item.needsRemoteDelete && types.includes(item.type);
+  if (types.includes("incubate")) {
+    return (
+      !item.isTrashed &&
+      !item.needsRemoteDelete &&
+      item.kind === "capture" &&
+      item.status === "incubate"
+    );
+  }
+
+  if (types.includes("media")) {
+    return (
+      !item.isTrashed &&
+      !item.needsRemoteDelete &&
+      item.kind === "reference" &&
+      (item.type === "link" || item.type === "literature")
+    );
+  }
+
+  return (
+    !item.isTrashed &&
+    !item.needsRemoteDelete &&
+    item.kind === "action" &&
+    item.type !== null &&
+    types.includes(item.type)
+  );
 }
 
 function isWritableItem(item: Awaited<ReturnType<typeof getAllItems>>[number]) {
-  return !item.isTrashed && !item.needsRemoteDelete && item.type !== "unknown";
+  return !item.isTrashed && !item.needsRemoteDelete && item.kind !== "capture";
 }
 
 export async function getInboxItems() {
   const items = await getVisibleItems();
-  return items.filter((item) => item.type === "unknown");
+  return items.filter((item) => item.kind === "capture" && item.status === "later");
 }
 
 export async function getInboxItemsForProcessing() {
   const items = await getAllItems();
 
   return sortByCreatedAtAscending(
-    items.filter((item) => isVisibleTypedItem(item, ["unknown"])),
+    items.filter(
+      (item) =>
+        !item.isTrashed &&
+        !item.needsRemoteDelete &&
+        item.kind === "capture" &&
+        item.status === "later",
+    ),
   );
 }
 
@@ -84,11 +115,66 @@ export async function getWritableItemById(id: string) {
 }
 
 export async function getReferenceItems() {
-  return getItemsByTypes(["reference"]);
+  return getItemsByKind("reference");
 }
 
 export async function getMediaItems() {
-  return getItemsByTypes(["media"]);
+  return getReferenceItemsByTypes(["link", "literature"]);
+}
+
+export async function getItemsByKind(kind: ItemKind) {
+  const items = await getAllItems();
+
+  return sortByCreatedAtDescending(
+    items.filter(
+      (item) => !item.isTrashed && !item.needsRemoteDelete && item.kind === kind,
+    ),
+  );
+}
+
+export async function getReferenceItemsByTypes(types: ItemType[]) {
+  const items = await getAllItems();
+
+  return sortByCreatedAtDescending(
+    items.filter(
+      (item) =>
+        !item.isTrashed &&
+        !item.needsRemoteDelete &&
+        item.kind === "reference" &&
+        item.type !== null &&
+        types.includes(item.type),
+    ),
+  );
+}
+
+export async function getItemCountsByRegistryType(kind: TypeRegistryKind) {
+  if (kind === "log") {
+    return new Map<string, { activeCount: number; archivedCount: number }>();
+  }
+
+  const items = await getAllItems();
+  const counts = new Map<string, { activeCount: number; archivedCount: number }>();
+
+  for (const item of items) {
+    if (item.kind !== kind || item.type === null || item.isTrashed) {
+      continue;
+    }
+
+    const current = counts.get(item.type) ?? {
+      activeCount: 0,
+      archivedCount: 0,
+    };
+
+    if (item.isArchived) {
+      current.archivedCount += 1;
+    } else {
+      current.activeCount += 1;
+    }
+
+    counts.set(item.type, current);
+  }
+
+  return counts;
 }
 
 export async function getWaitingItems() {
@@ -119,14 +205,16 @@ export async function getCalendarItems() {
 }
 
 export async function getSyncCounts() {
-  const [failed, pending] = await Promise.all([
+  const [failed, pending, failedTypes, pendingTypes] = await Promise.all([
     getItemsBySyncState("sync_error"),
     getItemsBySyncState("pending_sync"),
+    getTypeRegistryEntriesBySyncState("sync_error"),
+    getTypeRegistryEntriesBySyncState("pending_sync"),
   ]);
 
   return {
-    failedCount: failed.length,
-    pendingCount: pending.length,
+    failedCount: failed.length + failedTypes.length,
+    pendingCount: pending.length + pendingTypes.length,
   };
 }
 

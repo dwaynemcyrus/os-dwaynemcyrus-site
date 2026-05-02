@@ -10,18 +10,21 @@ export function getOriginalRouteForItem(item: LocalItem) {
     return ROUTES.calendar;
   }
 
-  switch (item.type) {
-    case "task":
-      return ROUTES.tasks;
-    case "project":
-      return ROUTES.projects;
-    case "reference":
-      return ROUTES.reference;
-    case "media":
-      return ROUTES.media;
-    case "incubate":
-      return ROUTES.incubate;
-    default:
-      return ROUTES.writing;
+  if (item.kind === "capture" && item.status === "incubate") {
+    return ROUTES.incubate;
   }
+
+  if (item.kind === "action" && item.type === "task") {
+    return ROUTES.tasks;
+  }
+
+  if (item.kind === "action" && item.type === "project") {
+    return ROUTES.projects;
+  }
+
+  if (item.kind === "reference") {
+    return ROUTES.reference;
+  }
+
+  return ROUTES.writing;
 }

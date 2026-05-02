@@ -9,10 +9,22 @@
 .wizard__copy,
 .wizard__field,
 .wizard__branch,
-.wizard__preview {
+.wizard__preview,
+.wizard__topbar {
   display: flex;
-  flex-direction: column;
   gap: var(--space-2);
+}
+
+.wizard__copy,
+.wizard__field,
+.wizard__branch,
+.wizard__preview {
+  flex-direction: column;
+}
+
+.wizard__topbar {
+  align-items: center;
+  justify-content: space-between;
 }
 
 .wizard__eyebrow,
@@ -60,5 +72,6 @@
 .wizard__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--space-3);
 }

@@ -7,6 +7,7 @@ import { CaptureDialog } from "@/components/capture/CaptureDialog";
 import { BackButton } from "@/components/navigation/BackButton";
 import { RestoreBackupPanel } from "@/components/settings/RestoreBackupPanel";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
+import { TypeSettingsPanel } from "@/components/settings/TypeSettingsPanel";
 import { LABELS } from "@/lib/constants/labels";
 import { useCaptureDialog } from "@/lib/hooks/useCaptureDialog";
 
@@ -29,6 +30,7 @@ export default function SettingsPage() {
       >
         <AuthPanel />
         <SettingsPanel />
+        <TypeSettingsPanel />
         <RestoreBackupPanel />
       </AppShell>
     </AuthGate>
