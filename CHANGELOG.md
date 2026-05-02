@@ -26,6 +26,7 @@ All notable commit-ready changes to this project should be recorded here.
 - Promoted `docs/build-specs/build-spec-v5-task-project-destination-views.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v6-gtd-full-flow.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v7-writing-workspace.md` to the current build in the build-spec entrypoint.
+- Replaced route-level null auth-loading states with a shared `AuthGate` loading screen across protected pages.
 - Re-defined inbox processing around `type = 'unknown'` and added `project` plus `incubate` as canonical processed types.
 - Moved the trash navigation entry from `/settings` to the home screen.
 - Moved backup export from the home account panel into `/settings` and restricted the signed-out home screen to auth-only UI.
@@ -51,6 +52,8 @@ All notable commit-ready changes to this project should be recorded here.
 
 ### Docs
 - Added and activated `build-spec-v7-writing-workspace.md` for the markdown writing workspace over processed items, with exact frontmatter preservation and a reserved `os` metadata block.
+- Added `README.md` with project overview, local development, verification, and repo workflow guidance.
+- Added `CLAUDE.md` and `GEMINI.md` instructional context files for alternate agent tooling.
 
 ## 1.1.0 - 2026-04-21
 
