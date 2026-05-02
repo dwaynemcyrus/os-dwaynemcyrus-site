@@ -29,6 +29,7 @@ export const LABELS = {
   inbox: "Inbox",
   importRestore: "Import / restore",
   markdownView: "Markdown View",
+  maybe: "Maybe",
   more: "More",
   newPassword: "New password",
   nextAction: "Next Action",

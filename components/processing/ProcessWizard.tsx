@@ -18,14 +18,15 @@ import styles from "./ProcessWizard.module.css";
 
 type WizardStep =
   | "commit"
+  | "commit-kind"
   | "creation-date"
   | "creation-type"
   | "creation-wait"
   | "date"
+  | "defer-kind"
   | "delegate"
   | "habit-date"
   | "keep"
-  | "kind"
   | "project"
   | "project-date"
   | "project-wait"
@@ -266,12 +267,12 @@ export function ProcessWizard({
 
       {step === "commit" ? (
         <Question title="Commit now?">
-          <TextButton disabled={isSubmitting} onPress={() => go("kind")}>
+          <TextButton disabled={isSubmitting} onPress={() => go("commit-kind")}>
             Yes
           </TextButton>
           <TextButton
             disabled={isSubmitting}
-            onPress={() => void finish({ decision: "incubate" })}
+            onPress={() => go("defer-kind")}
             variant="secondary"
           >
             Not yet
@@ -279,16 +280,28 @@ export function ProcessWizard({
         </Question>
       ) : null}
 
-      {step === "kind" ? (
+      {step === "commit-kind" ? (
         <Question title="What kind of item?">
           <TextButton disabled={isSubmitting} onPress={() => go("recurring")}>
             Action
           </TextButton>
+          <TextButton disabled={isSubmitting} onPress={() => go("creation-type")}>
+            Creation
+          </TextButton>
+        </Question>
+      ) : null}
+
+      {step === "defer-kind" ? (
+        <Question title="What kind of item?">
           <TextButton disabled={isSubmitting} onPress={() => go("reference-type")}>
             Reference
           </TextButton>
-          <TextButton disabled={isSubmitting} onPress={() => go("creation-type")}>
-            Creation
+          <TextButton
+            disabled={isSubmitting}
+            onPress={() => void finish({ decision: "incubate" })}
+            variant="secondary"
+          >
+            {LABELS.maybe}
           </TextButton>
         </Question>
       ) : null}

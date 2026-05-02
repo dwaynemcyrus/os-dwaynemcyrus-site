@@ -25,6 +25,8 @@ All notable commit-ready changes to this project should be recorded here.
 - Database migration adding `subtype`, `start_at`, `end_at` columns and `media`/`waiting` constraints.
 
 ### Changed
+- Split the processing wizard kind picker so committed captures offer Action/Creation and deferred captures offer Reference/Maybe.
+- Promoted `docs/build-specs/build-spec-v8-amendment.md` to the current build in the build-spec entrypoint.
 - Promoted `docs/build-specs/build-spec-v8-capture-processing-overhaul.md` to the current build in the build-spec entrypoint.
 - Reworked `/process` around the v8 keep/commit/kind decision tree with editable capture text, Back, Skip, Exit, and terminal conflict checks.
 - Updated capture defaults and destination queries to use v8 `kind`, `type`, and `status` semantics while keeping legacy fields compatible.

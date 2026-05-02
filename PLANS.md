@@ -11,6 +11,10 @@ This file tracks active and historical execution plans for non-trivial work.
 
 ## Completed
 
+### 2026-05-02 — V8 amendment wizard flow
+- Status: completed
+- Summary: split the processing wizard's post-commit kind picker so committed captures route only to Action or Creation, while not-yet captures route to Reference or Maybe/incubate without classifying the item.
+
 ### 2026-05-02 — V8 capture processing overhaul
 - Status: completed
 - Summary: activated the v8 capture processing build, added additive v8 item fields plus local/remote type registry support, rewrote capture processing around the v8 decision tree, added Types settings management, and added focused Vitest coverage for registry logic.
